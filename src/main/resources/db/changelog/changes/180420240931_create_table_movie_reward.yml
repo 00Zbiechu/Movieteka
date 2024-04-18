@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_movie_reward
+      author: mzbiewski
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: MOVIE_REWARD
+      changes:
+        - createTable:
+            tableName: MOVIE_REWARD
+            columns:
+              - column:
+                  name: movie_id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: MOVIE_REWARD_MOVIE_ID_PK
+                    referencedTableName: MOVIE
+                    referencedColumnNames: id
+                    foreignKeyName: MOVIE_REWARD_MOVIE_FK
+              - column:
+                  name: reward_id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: MOVIE_REWARD_REWARD_ID_PK
+                    referencedTableName: REWARD
+                    referencedColumnNames: id
+                    foreignKeyName: MOVIE_REWARD_REWARD_FK
+              - column:
+                  name: award_received_date
+                  type: date
+                  constraints:
+                    nullable: false

@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_reward
+      author: mzbiewski
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: REWARD
+      changes:
+        - createTable:
+            tableName: REWARD
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: REWARD_ID_PK
+              - column:
+                  name: name
+                  type: varchar
+                  constraints:
+                    nullable: false

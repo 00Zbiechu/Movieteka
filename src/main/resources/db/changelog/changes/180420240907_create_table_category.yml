@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_category
+      author: mzbiewski
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: CATEGORY
+      changes:
+        - createTable:
+            tableName: CATEGORY
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: CATEGORY_ID_PK
+              - column:
+                  name: name
+                  type: varchar
+                  constraints:
+                    nullable: false
+

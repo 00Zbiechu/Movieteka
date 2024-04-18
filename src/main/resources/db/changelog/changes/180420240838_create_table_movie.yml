@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_movie
+      author: mzbiewski
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: MOVIE
+      changes:
+        - createTable:
+            tableName: MOVIE
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: MOVIE_ID_PK
+              - column:
+                  name: title
+                  type: varchar
+                  constraints:
+                    nullable: false
+              - column:
+                  name: year_of_production
+                  type: smallint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: review
+                  type: real
+                  constraints:
+                    nullable: false
+              - column:
+                  name: photo
+                  type: bytea
+

@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - include:
+      file: ./changes/180420240838_create_table_movie.yml
+      relativeToChangelogFile: true
+  - include:
+      file: ./changes/180420240907_create_table_category.yml
+      relativeToChangelogFile: true
+  - include:
+      file: ./changes/180420240913_create_table_movie_category.yml
+      relativeToChangelogFile: true
+  - include:
+      file: ./changes/180420240926_create_table_reward.yml
+      relativeToChangelogFile: true
+  - include:
+      file: ./changes/180420240931_create_table_movie_reward.yml
+      relativeToChangelogFile: true

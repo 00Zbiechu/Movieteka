@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_movie_category
+      author: mzbiewski
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: MOVIE_CATEGORY
+      changes:
+        - createTable:
+            tableName: MOVIE_CATEGORY
+            columns:
+              - column:
+                  name: movie_id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: MOVIE_CATEGORY_MOVIE_ID_PK
+                    referencedTableName: MOVIE
+                    referencedColumnNames: id
+                    foreignKeyName: CATEGORY_MOVIE_MOVIE_FK
+              - column:
+                  name: category_id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: MOVIE_CATEGORY_CATEGORY_ID_PK
+                    referencedTableName: CATEGORY
+                    referencedColumnNames: id
+                    foreignKeyName: CATEGORY_MOVIE_CATEGORY_FK
