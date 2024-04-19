@@ -1,8 +1,8 @@
 package pl.ambsoft.movieteka.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -45,8 +46,8 @@ public class MovieEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<CategoryEntity> categoryEntities;
+    private Set<CategoryEntity> categoryEntities = new HashSet<>();
 
-    @OneToMany(mappedBy = "movieRewardKey.movieEntity", fetch = FetchType.LAZY)
-    private Set<MovieRewardEntity> movieRewardEntities;
+    @OneToMany(mappedBy = "movieRewardKey.movieEntity", cascade = CascadeType.REMOVE)
+    private Set<MovieRewardEntity> movieRewardEntities = new HashSet<>();
 }

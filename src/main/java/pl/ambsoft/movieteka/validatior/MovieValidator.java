@@ -36,6 +36,9 @@ public class MovieValidator implements Validator {
     }
 
     private void validateIsMovieTitleUnique(MovieDto dto) {
+        if (dto.getId() != null) {
+            return;
+        }
         movieRepository.findByTitle(dto.getTitle()).ifPresent(movie -> {
             throw new CustomErrorException(dto.getTitle(), ErrorCodes.ENTITY_ALREADY_EXIST, HttpStatus.BAD_REQUEST);
         });

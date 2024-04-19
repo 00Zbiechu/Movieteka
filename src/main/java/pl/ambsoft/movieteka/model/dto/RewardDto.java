@@ -1,9 +1,8 @@
 package pl.ambsoft.movieteka.model.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 
-import java.time.LocalDate;
-
 @Builder
-public record RewardDto(Long id, String name, LocalDate awardReceivedDate) {
+public record RewardDto(Long id, @NotEmpty String name) {
 }

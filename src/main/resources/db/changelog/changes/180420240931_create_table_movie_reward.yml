@@ -4,12 +4,17 @@ databaseChangeLog:
       author: mzbiewski
       preConditions:
         - onFail: MARK_RAN
-          not:
-            tableExists:
-              tableName: MOVIE_REWARD
+          and:
+            - not:
+                tableExists:
+                  tableName: MOVIE_REWARD
+            - tableExists:
+                tableName: "MOVIE"
+            - tableExists:
+                tableName: "REWARD"
       changes:
         - createTable:
-            tableName: MOVIE_REWARD
+            tableName: "MOVIE_REWARD"
             columns:
               - column:
                   name: movie_id
@@ -18,9 +23,6 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     primaryKeyName: MOVIE_REWARD_MOVIE_ID_PK
-                    referencedTableName: MOVIE
-                    referencedColumnNames: id
-                    foreignKeyName: MOVIE_REWARD_MOVIE_FK
               - column:
                   name: reward_id
                   type: bigint
@@ -28,11 +30,22 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     primaryKeyName: MOVIE_REWARD_REWARD_ID_PK
-                    referencedTableName: REWARD
-                    referencedColumnNames: id
-                    foreignKeyName: MOVIE_REWARD_REWARD_FK
               - column:
                   name: award_received_date
                   type: date
                   constraints:
                     nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: MOVIE_REWARD
+            baseColumnNames: movie_id
+            referencedTableName: "MOVIE"
+            referencedColumnNames: id
+            constraintName: MOVIE_REWARD_MOVIE_FK
+
+        - addForeignKeyConstraint:
+            baseTableName: MOVIE_REWARD
+            baseColumnNames: reward_id
+            referencedTableName: "REWARD"
+            referencedColumnNames: id
+            constraintName: MOVIE_REWARD_REWARD_FK

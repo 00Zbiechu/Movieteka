@@ -1,6 +1,5 @@
 package pl.ambsoft.movieteka.exception;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ControllerAdvice
-@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomErrorException.class)

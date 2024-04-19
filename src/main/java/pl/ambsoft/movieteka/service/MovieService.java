@@ -9,4 +9,12 @@ public interface MovieService {
     MoviesDto getAllMovies();
 
     MoviesDto addNewMovie(MovieDto movieDto, MultipartFile photo);
+
+    MoviesDto deleteMovie(Long id);
+
+    MoviesDto editMovie(MovieDto editMovieDto);
+
+    MoviesDto filterMovieByCategory(String category);
+
+    MoviesDto searchMovieByTitle(String title);
 }

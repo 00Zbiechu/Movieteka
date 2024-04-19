@@ -6,10 +6,10 @@ databaseChangeLog:
         - onFail: MARK_RAN
           not:
             tableExists:
-              tableName: REWARD
+              tableName: "REWARD"
       changes:
         - createTable:
-            tableName: REWARD
+            tableName: "REWARD"
             columns:
               - column:
                   name: id

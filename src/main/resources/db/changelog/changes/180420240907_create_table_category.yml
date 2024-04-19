@@ -6,10 +6,10 @@ databaseChangeLog:
         - onFail: MARK_RAN
           not:
             tableExists:
-              tableName: CATEGORY
+              tableName: "CATEGORY"
       changes:
         - createTable:
-            tableName: CATEGORY
+            tableName: "CATEGORY"
             columns:
               - column:
                   name: id

@@ -6,10 +6,10 @@ databaseChangeLog:
         - onFail: MARK_RAN
           not:
             tableExists:
-              tableName: MOVIE_CATEGORY
+              tableName: "MOVIE_CATEGORY"
       changes:
         - createTable:
-            tableName: MOVIE_CATEGORY
+            tableName: "MOVIE_CATEGORY"
             columns:
               - column:
                   name: movie_id

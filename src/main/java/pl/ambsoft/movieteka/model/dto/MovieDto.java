@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.ambsoft.movieteka.model.dto.wrapper.CategoriesDto;
-import pl.ambsoft.movieteka.model.dto.wrapper.RewardsDto;
 
 @Getter
 @Setter
@@ -37,9 +36,6 @@ public class MovieDto {
 
     @NotNull
     private CategoriesDto categoriesDto;
-
-    @NotNull
-    private RewardsDto rewardsDto;
 
     private byte[] photo;
 }
