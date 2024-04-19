@@ -10,6 +10,8 @@ import pl.ambsoft.movieteka.model.dto.CategoryDto;
 import pl.ambsoft.movieteka.model.dto.MovieDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.CategoriesDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.MoviesDto;
+import pl.ambsoft.movieteka.model.entity.CategoryEntity;
+import pl.ambsoft.movieteka.model.entity.MovieEntity;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -76,5 +78,90 @@ class MovieIT extends BaseTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].review").value(expectedMovieList.get(0).movies().get(0).getReview()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].description").value(expectedMovieList.get(0).movies().get(0).getDescription()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].categoriesDto.categories.size()").value(expectedMovieList.get(0).movies().get(0).getCategoriesDto().getCategories().size()));
+    }
+
+    @DisplayName("Should return bad request cause movie with this title exist")
+    @Test
+    void shouldThrowExceptionCauseMovieWithThisTitleExist() throws Exception {
+
+        var movie = MovieDto.builder()
+                .title("Test")
+                .description("Very nice movie")
+                .review(5.0f)
+                .yearOfProduction((short) 2004)
+                .categoriesDto(
+                        CategoriesDto.builder()
+                                .categories(
+                                        Set.of(CategoryDto.builder()
+                                                .name("horror")
+                                                .build()
+                                        )
+                                ).build()
+                )
+                .build();
+
+        entityManager.persist(MovieEntity.builder()
+                .title("Test")
+                .description("Very nice movie")
+                .review(5.0f)
+                .yearOfProduction((short) 2004)
+                .categoryEntities(
+                        Set.of(CategoryEntity.builder()
+                                .name("horror")
+                                .build()
+                        )
+                )
+                .build());
+
+        var movieJson = new MockMultipartFile(
+                "movieDto",
+                null,
+                "application/json",
+                asJson(movie).getBytes()
+        );
+
+        //when
+        var response = mockMvc.perform(MockMvcRequestBuilders.multipart(PATH)
+                .file(movieJson)
+        );
+
+        //then
+        response.andExpect(status().isBadRequest());
+    }
+
+    @DisplayName("Should return bad request cause category does not exist")
+    @Test
+    void shouldThrowExceptionCauseCategoryDoesNotExist() throws Exception {
+
+        var movie = MovieDto.builder()
+                .title("Test")
+                .description("Very nice movie")
+                .review(5.0f)
+                .yearOfProduction((short) 2004)
+                .categoriesDto(
+                        CategoriesDto.builder()
+                                .categories(
+                                        Set.of(CategoryDto.builder()
+                                                .name("test")
+                                                .build()
+                                        )
+                                ).build()
+                )
+                .build();
+
+        var movieJson = new MockMultipartFile(
+                "movieDto",
+                null,
+                "application/json",
+                asJson(movie).getBytes()
+        );
+
+        //when
+        var response = mockMvc.perform(MockMvcRequestBuilders.multipart(PATH)
+                .file(movieJson)
+        );
+
+        //then
+        response.andExpect(status().isBadRequest());
     }
 }
