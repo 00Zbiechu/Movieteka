@@ -2,7 +2,6 @@ package pl.ambsoft.movieteka.mapper.decorator;
 
 import com.google.common.collect.Sets;
 import lombok.NoArgsConstructor;
-import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import pl.ambsoft.movieteka.exception.CustomErrorException;
@@ -66,7 +65,13 @@ public abstract class MovieMapperDecorator implements MovieMapper {
     }
 
     @Override
-    public void updateMovieEntityWithMovieDto(@MappingTarget MovieEntity movieEntity, MovieDto movieDto) {
+    public void updateMovieEntityWithMovieDto(MovieEntity movieEntity, MovieDto movieDto) {
+        movieEntity.setId(movieDto.getId());
+        movieEntity.setTitle(movieDto.getTitle());
+        movieEntity.setYearOfProduction(movieDto.getYearOfProduction());
+        movieEntity.setDescription(movieDto.getDescription());
+        movieEntity.setReview(movieDto.getReview());
+        movieEntity.setPhoto(movieDto.getPhoto());
         setCategoriesForMovieEntity(movieDto, movieEntity);
     }
 }

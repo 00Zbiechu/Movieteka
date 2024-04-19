@@ -1,10 +1,10 @@
 package pl.ambsoft.movieteka.controller;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.ambsoft.movieteka.BaseTest;
 import pl.ambsoft.movieteka.model.dto.RewardDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.RewardsDto;
@@ -33,8 +33,9 @@ class RewardIT extends BaseTest {
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH));
 
         //then
-        response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.rewards.size()").value(1));
+        var result = asObject(response, RewardsDto.class);
+        response.andExpect(status().isOk());
+        Assertions.assertEquals(1, result.rewards().size());
     }
 
     @DisplayName("Should add new reward")
@@ -58,11 +59,12 @@ class RewardIT extends BaseTest {
                 .content(objectMapper.writeValueAsString(rewardsDto)));
 
         //then
-        response.andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.rewards.size()").value(1));
+        var result = asObject(response, RewardsDto.class);
+        response.andExpect(status().isCreated());
+        Assertions.assertEquals(1, result.rewards().size());
     }
 
-    @DisplayName("Should return bad request cause blank name")
+    @DisplayName("Should return bad request when add method cause blank name of category")
     @Test
     void shouldReturnBadRequestCauseBlankName() throws Exception {
 
@@ -102,7 +104,8 @@ class RewardIT extends BaseTest {
                 .param("id", rewardEntity.getId().toString()));
 
         //then
-        response.andExpect(status().isAccepted())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.rewards.size()").value(0));
+        var result = asObject(response, RewardsDto.class);
+        response.andExpect(status().isAccepted());
+        Assertions.assertEquals(0, result.rewards().size());
     }
 }

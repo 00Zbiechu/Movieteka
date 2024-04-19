@@ -1,5 +1,6 @@
 package pl.ambsoft.movieteka.controller;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,7 +9,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.ambsoft.movieteka.BaseTest;
 import pl.ambsoft.movieteka.model.dto.CategoryDto;
 import pl.ambsoft.movieteka.model.dto.MovieDto;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class MovieIT extends BaseTest {
@@ -51,8 +52,9 @@ class MovieIT extends BaseTest {
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH));
 
         //then
-        response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies.size()").value(1));
+        var result = asObject(response, MoviesDto.class);
+        response.andExpect(status().isOk());
+        Assertions.assertEquals(1, result.movies().size());
     }
 
     @DisplayName("Should add new movie")
@@ -103,12 +105,16 @@ class MovieIT extends BaseTest {
         );
 
         //then
-        response.andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies.size()").value("1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].title").value(expectedMovieList.get(0).movies().get(0).getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].review").value(expectedMovieList.get(0).movies().get(0).getReview()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].description").value(expectedMovieList.get(0).movies().get(0).getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].categoriesDto.categories.size()").value(expectedMovieList.get(0).movies().get(0).getCategoriesDto().getCategories().size()));
+        var result = asObject(response, MoviesDto.class);
+        response.andExpect(status().isCreated());
+        assertAll(
+                () -> Assertions.assertEquals(1, result.movies().size()),
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getReview(), result.movies().get(0).getReview()),
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getDescription(), result.movies().get(0).getDescription()),
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategoriesDto().getCategories().size(), result.movies().get(0).getCategoriesDto().getCategories().size())
+        );
     }
 
     @DisplayName("Should return bad request cause wrong data in request body")
@@ -199,8 +205,9 @@ class MovieIT extends BaseTest {
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH).param("id", movieEntity.getId().toString()));
 
         //then
-        response.andExpect(status().isAccepted())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies.size()").value(0));
+        var result = asObject(response, MoviesDto.class);
+        response.andExpect(status().isAccepted());
+        Assertions.assertEquals(0, result.movies().size());
     }
 
     @DisplayName("Should delete movie cause entity does not exist")
@@ -238,7 +245,6 @@ class MovieIT extends BaseTest {
         var categoryEntity = CategoryEntity.builder().name("horror").build();
         var categoryEntityTwo = CategoryEntity.builder().name("melodrama").build();
 
-        entityManager.persist(categoryEntity);
         entityManager.persist(categoryEntityTwo);
 
         var movieEntity = MovieEntity.builder()
@@ -279,18 +285,22 @@ class MovieIT extends BaseTest {
                 .content(objectMapper.writeValueAsString(movieDto)));
 
         //then
-        response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies.size()").value("1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].title").value(movieDto.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].review").value(movieDto.getReview()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].description").value(movieDto.getDescription()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies[0].categoriesDto.categories.size()").value(2));
+        var result = asObject(response, MoviesDto.class);
+        response.andExpect(status().isOk());
+        assertAll(
+                () -> Assertions.assertEquals(1, result.movies().size()),
+                () -> Assertions.assertEquals(movieDto.getTitle(), result.movies().get(0).getTitle()),
+                () -> Assertions.assertEquals(movieDto.getReview(), result.movies().get(0).getReview()),
+                () -> Assertions.assertEquals(movieDto.getDescription(), result.movies().get(0).getDescription()),
+                () -> Assertions.assertEquals(movieDto.getTitle(), result.movies().get(0).getTitle()),
+                () -> Assertions.assertEquals(movieDto.getCategoriesDto().getCategories().size(), result.movies().get(0).getCategoriesDto().getCategories().size())
+        );
     }
 
 
-    @DisplayName("Should filter and find 2 movies")
+    @DisplayName("Should filter and find two movies")
     @Test
-    void shouldFilterAndFind2Movies() throws Exception {
+    void shouldFilterAndFindTwoMovies() throws Exception {
 
         //given
         var categoryEntity = CategoryEntity.builder().name("horror").build();
@@ -337,8 +347,9 @@ class MovieIT extends BaseTest {
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/filter").param("category", "horror"));
 
         //then
-        response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies.size()").value(2));
+        var result = asObject(response, MoviesDto.class);
+        response.andExpect(status().isOk());
+        Assertions.assertEquals(2, result.movies().size());
     }
 
     @DisplayName("Should search and find movie by title")
@@ -379,7 +390,8 @@ class MovieIT extends BaseTest {
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/search").param("title", "One"));
 
         //then
-        response.andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.movies.size()").value(1));
+        var result = asObject(response, MoviesDto.class);
+        response.andExpect(status().isOk());
+        Assertions.assertEquals(1, result.movies().size());
     }
 }
