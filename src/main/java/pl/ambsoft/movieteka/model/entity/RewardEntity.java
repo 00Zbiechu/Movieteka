@@ -10,8 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,5 +26,5 @@ public class RewardEntity extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "movieRewardKey.rewardEntity")
-    private Set<MovieRewardEntity> movieRewardEntities = new HashSet<>();
+    private List<MovieRewardEntity> movieRewardEntities = new ArrayList<>();
 }

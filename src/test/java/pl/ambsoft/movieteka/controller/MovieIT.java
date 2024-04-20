@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.querydsl.codegen.utils.Symbols.EMPTY;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +42,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(CategoryEntity.builder()
+                        List.of(CategoryEntity.builder()
                                 .name("horror")
                                 .build()
                         )
@@ -117,10 +118,10 @@ class MovieIT extends BaseTest {
         );
     }
 
-    @DisplayName("Should return bad request cause wrong data in request body")
+    @DisplayName("Should return bad request when add movie endpoint is used cause wrong data in request body")
     @MethodSource("addMovieTestArguments")
     @ParameterizedTest
-    void shouldReturnBadRequest(String title, String description, Float review, Short yearOfProduction, String category) throws Exception {
+    void shouldReturnBadRequestWhenAddMovieEndpointIsUsed(String title, String description, Float review, Short yearOfProduction, String category) throws Exception {
 
         var movie = MovieDto.builder()
                 .title(title)
@@ -144,7 +145,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(CategoryEntity.builder()
+                        List.of(CategoryEntity.builder()
                                 .name("horror")
                                 .build()
                         )
@@ -170,9 +171,9 @@ class MovieIT extends BaseTest {
     private static Stream<Arguments> addMovieTestArguments() {
         return Stream.of(
                 Arguments.of("Test", "Very nice movie", 4.4f, (short) 2004, "horror"),
-                Arguments.of("", "Very nice movie", 4.4f, (short) 2004, "horror"),
+                Arguments.of(EMPTY, "Very nice movie", 4.4f, (short) 2004, "horror"),
                 Arguments.of(null, "Very nice movie", 4.4f, (short) 2004, "horror"),
-                Arguments.of("Title", "", 4.4f, (short) 2004, "horror"),
+                Arguments.of("Title", EMPTY, 4.4f, (short) 2004, "horror"),
                 Arguments.of("Title", null, 4.4f, (short) 2004, "horror"),
                 Arguments.of("Title", "Very nice movie", null, (short) 2004, "horror"),
                 Arguments.of("Title", "Very nice movie", 4.4f, null, "horror"),
@@ -192,7 +193,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(CategoryEntity.builder()
+                        List.of(CategoryEntity.builder()
                                 .name("horror")
                                 .build()
                         )
@@ -221,7 +222,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(CategoryEntity.builder()
+                        List.of(CategoryEntity.builder()
                                 .name("horror")
                                 .build()
                         )
@@ -253,7 +254,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(categoryEntity)
+                        List.of(categoryEntity)
                 )
                 .build();
 
@@ -298,16 +299,19 @@ class MovieIT extends BaseTest {
     }
 
 
-    @DisplayName("Should filter and find two movies")
-    @Test
-    void shouldFilterAndFindTwoMovies() throws Exception {
+    @DisplayName("Should filter movies by category and find movies")
+    @ParameterizedTest
+    @MethodSource("filterTestArguments")
+    void shouldFilterMoviesAndByCategoryAndFindMovies(String category, int size) throws Exception {
 
         //given
         var categoryEntity = CategoryEntity.builder().name("horror").build();
         var categoryEntityTwo = CategoryEntity.builder().name("melodrama").build();
+        var categoryEntityThree = CategoryEntity.builder().name("sci-fi").build();
 
         entityManager.persist(categoryEntity);
         entityManager.persist(categoryEntityTwo);
+        entityManager.persist(categoryEntityThree);
 
         var movieEntityHorrorOne = MovieEntity.builder()
                 .title("TestOne")
@@ -315,7 +319,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(categoryEntity)
+                        List.of(categoryEntity)
                 )
                 .build();
 
@@ -325,36 +329,45 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(categoryEntity)
+                        List.of(categoryEntity)
                 )
                 .build();
 
-        var movieEntityHorrorThree = MovieEntity.builder()
+        var movieEntityMelodramaThree = MovieEntity.builder()
                 .title("TestThree")
                 .description("Very nice movie")
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(categoryEntityTwo)
+                        List.of(categoryEntityTwo)
                 )
                 .build();
 
         entityManager.persist(movieEntityHorrorOne);
         entityManager.persist(movieEntityHorrorTwo);
-        entityManager.persist(movieEntityHorrorThree);
+        entityManager.persist(movieEntityMelodramaThree);
 
         //when
-        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/filter").param("category", "horror"));
+        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/filter").param("category", category));
 
         //then
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
-        Assertions.assertEquals(2, result.movies().size());
+        Assertions.assertEquals(size, result.movies().size());
+    }
+
+    private static Stream<Arguments> filterTestArguments() {
+        return Stream.of(
+                Arguments.of("horror", 2),
+                Arguments.of("melodrama", 1),
+                Arguments.of("sci-fi", 0)
+        );
     }
 
     @DisplayName("Should search and find movie by title")
-    @Test
-    void shouldSearchAndFindMovieByTitle() throws Exception {
+    @ParameterizedTest
+    @MethodSource("searchTestArguments")
+    void shouldSearchAndFindMovieByTitle(String title, int size) throws Exception {
 
         //given
         var categoryEntity = CategoryEntity.builder().name("horror").build();
@@ -369,7 +382,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(categoryEntity)
+                        List.of(categoryEntity)
                 )
                 .build();
 
@@ -379,7 +392,7 @@ class MovieIT extends BaseTest {
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
-                        Set.of(categoryEntity)
+                        List.of(categoryEntity)
                 )
                 .build();
 
@@ -387,11 +400,20 @@ class MovieIT extends BaseTest {
         entityManager.persist(movieEntityHorrorTwo);
 
         //when
-        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/search").param("title", "One"));
+        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/search").param("title", title));
 
         //then
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
-        Assertions.assertEquals(1, result.movies().size());
+        Assertions.assertEquals(size, result.movies().size());
+    }
+
+    private static Stream<Arguments> searchTestArguments() {
+        return Stream.of(
+                Arguments.of("One", 1),
+                Arguments.of("Two", 1),
+                Arguments.of("Test", 2),
+                Arguments.of("Title", 0)
+        );
     }
 }

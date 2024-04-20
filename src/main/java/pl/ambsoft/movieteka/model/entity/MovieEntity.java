@@ -14,8 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -46,8 +46,8 @@ public class MovieEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<CategoryEntity> categoryEntities = new HashSet<>();
+    private List<CategoryEntity> categoryEntities = new ArrayList<>();
 
     @OneToMany(mappedBy = "movieRewardKey.movieEntity", cascade = CascadeType.REMOVE)
-    private Set<MovieRewardEntity> movieRewardEntities = new HashSet<>();
+    private List<MovieRewardEntity> movieRewardEntities = new ArrayList<>();
 }

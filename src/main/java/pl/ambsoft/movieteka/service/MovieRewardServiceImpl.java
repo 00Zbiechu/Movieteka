@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.ambsoft.movieteka.exception.CustomErrorException;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
+import pl.ambsoft.movieteka.model.dto.MovieRewardDto;
+import pl.ambsoft.movieteka.model.dto.wrapper.MovieRewardsDto;
 import pl.ambsoft.movieteka.model.entity.MovieRewardEntity;
 import pl.ambsoft.movieteka.model.entity.key.MovieRewardKey;
 import pl.ambsoft.movieteka.repository.MovieRepository;
@@ -12,6 +14,7 @@ import pl.ambsoft.movieteka.repository.MovieRewardRepository;
 import pl.ambsoft.movieteka.repository.RewardRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,18 @@ public class MovieRewardServiceImpl implements MovieRewardService {
     private final MovieRepository movieRepository;
 
     private final RewardRepository rewardRepository;
+
+    @Override
+    public MovieRewardsDto getAllRewardsForMovie(Long movieId) {
+        List<MovieRewardEntity> movieRewardEntities = movieRewardRepository.findAllByMovieId(movieId);
+        return MovieRewardsDto.builder().movieRewardDtoList(movieRewardEntities.stream()
+                        .map(movieReward -> MovieRewardDto.builder()
+                                .id(movieId)
+                                .name(movieReward.getMovieRewardKey().getMovieEntity().getTitle())
+                                .awardReceivedDate(movieReward.getAwardReceivedDate())
+                                .build()).toList())
+                .build();
+    }
 
     @Override
     public void addRewardToMovie(Long movieId, Long rewardId, LocalDate awardReceivedDate) {

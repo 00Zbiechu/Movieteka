@@ -10,8 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,5 +26,5 @@ public class CategoryEntity extends BaseEntity {
     private String name;
 
     @ManyToMany(mappedBy = "categoryEntities")
-    private Set<MovieEntity> movieEntities = new HashSet<>();
+    private List<MovieEntity> movieEntities = new ArrayList<>();
 }

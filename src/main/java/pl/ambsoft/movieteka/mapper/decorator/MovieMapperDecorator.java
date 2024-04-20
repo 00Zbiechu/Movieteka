@@ -1,5 +1,6 @@
 package pl.ambsoft.movieteka.mapper.decorator;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import pl.ambsoft.movieteka.model.entity.CategoryEntity;
 import pl.ambsoft.movieteka.model.entity.MovieEntity;
 import pl.ambsoft.movieteka.repository.CategoryRepository;
 
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -37,11 +39,11 @@ public abstract class MovieMapperDecorator implements MovieMapper {
     }
 
     private void setCategoriesForMovieEntity(MovieDto dto, MovieEntity movieEntity) {
-        Set<CategoryEntity> categoriesSet = Sets.newHashSet();
+        List<CategoryEntity> categoryEntityList = Lists.newArrayList();
         for (CategoryDto categoryDto : dto.getCategoriesDto().getCategories()) {
-            categoriesSet.add(categoryRepository.findByName(categoryDto.name()).orElseThrow(() -> new CustomErrorException("category", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)));
+            categoryEntityList.add(categoryRepository.findByName(categoryDto.name()).orElseThrow(() -> new CustomErrorException("category", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)));
         }
-        movieEntity.setCategoryEntities(categoriesSet);
+        movieEntity.setCategoryEntities(categoryEntityList);
     }
 
     @Override

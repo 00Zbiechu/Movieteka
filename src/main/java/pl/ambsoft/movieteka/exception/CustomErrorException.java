@@ -1,12 +1,12 @@
 package pl.ambsoft.movieteka.exception;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
+@Getter
+@Setter
 public class CustomErrorException extends RuntimeException {
 
     private final String field;

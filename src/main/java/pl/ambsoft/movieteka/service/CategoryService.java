@@ -4,5 +4,5 @@ import pl.ambsoft.movieteka.model.dto.wrapper.CategoriesDto;
 
 public interface CategoryService {
 
-    CategoriesDto getAll();
+    CategoriesDto getAllCategories();
 }

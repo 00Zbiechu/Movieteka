@@ -12,6 +12,7 @@ import pl.ambsoft.movieteka.model.entity.RewardEntity;
 
 import java.util.Set;
 
+import static com.querydsl.codegen.utils.Symbols.EMPTY;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class RewardIT extends BaseTest {
@@ -64,16 +65,16 @@ class RewardIT extends BaseTest {
         Assertions.assertEquals(1, result.rewards().size());
     }
 
-    @DisplayName("Should return bad request when add method cause blank name of category")
+    @DisplayName("Should return bad request when add method cause blank name of reward name")
     @Test
-    void shouldReturnBadRequestCauseBlankName() throws Exception {
+    void shouldReturnBadRequestWhenAddMethodCauseBlankNameOfRewardName() throws Exception {
 
         //given
         RewardsDto rewardsDto = RewardsDto.builder()
                 .rewards(
                         Set.of(
                                 RewardDto.builder()
-                                        .name("")
+                                        .name(EMPTY)
                                         .build()
                         )
                 )
@@ -107,5 +108,24 @@ class RewardIT extends BaseTest {
         var result = asObject(response, RewardsDto.class);
         response.andExpect(status().isAccepted());
         Assertions.assertEquals(0, result.rewards().size());
+    }
+
+    @DisplayName("Should return bad request when delete reward endpoint is hit cause reward with id does not exist")
+    @Test
+    void shouldReturnBadRequestWhenDeleteRewardEndpointIsHitCauseRewardWithIdDoesNotExist() throws Exception {
+
+        //given
+        var rewardEntity = RewardEntity.builder()
+                .name("Oscar")
+                .build();
+
+        entityManager.persist(rewardEntity);
+
+        //when
+        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH)
+                .param("id", String.valueOf(rewardEntity.getId() + 1)));
+
+        //then
+        response.andExpect(status().isBadRequest());
     }
 }

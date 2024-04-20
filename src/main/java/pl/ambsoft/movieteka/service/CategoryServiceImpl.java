@@ -17,7 +17,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public CategoriesDto getAll() {
+    public CategoriesDto getAllCategories() {
         return CategoriesDto.builder().categories(categoryRepository.findAll().stream().map(categoryMapper::toDto).collect(Collectors.toSet())).build();
     }
 }
