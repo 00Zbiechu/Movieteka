@@ -1,6 +1,7 @@
 package pl.ambsoft.movieteka.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,16 +23,19 @@ public class RewardController {
 
     private final RewardService rewardService;
 
+    @Operation(summary = "Get all rewards")
     @GetMapping
     public ResponseEntity<RewardsDto> getRewards() {
         return new ResponseEntity<>(rewardService.getRewards(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Add new reward")
     @PostMapping
     public ResponseEntity<RewardsDto> addNewRewards(@Valid @RequestBody RewardsDto rewardsDto) {
         return new ResponseEntity<>(rewardService.addNewRewards(rewardsDto), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Delete reward by id")
     @DeleteMapping
     public ResponseEntity<RewardsDto> deleteReward(@RequestParam Long id) {
         return new ResponseEntity<>(rewardService.deleteReward(id), HttpStatus.ACCEPTED);

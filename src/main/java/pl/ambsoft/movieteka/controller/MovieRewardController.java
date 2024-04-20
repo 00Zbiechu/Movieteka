@@ -1,5 +1,6 @@
 package pl.ambsoft.movieteka.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,20 +22,21 @@ public class MovieRewardController {
 
     private final MovieRewardService movieRewardService;
 
+    @Operation(summary = "Get all rewards for movie by id")
     @GetMapping
     public ResponseEntity<MovieRewardsDto> getAllRewardsForMovie(@RequestParam Long movieId) {
         return new ResponseEntity<>(movieRewardService.getAllRewardsForMovie(movieId), HttpStatus.OK);
     }
 
+    @Operation(summary = "Add reward to movie by passing movieId, rewardId and award received date")
     @PostMapping
-    public ResponseEntity<Void> addRewardToMovie(@RequestParam Long movieId, @RequestParam Long rewardId, @RequestParam LocalDate awardReceivedDate) {
-        movieRewardService.addRewardToMovie(movieId, rewardId, awardReceivedDate);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<MovieRewardsDto> addRewardToMovie(@RequestParam Long movieId, @RequestParam Long rewardId, @RequestParam LocalDate awardReceivedDate) {
+        return new ResponseEntity<>(movieRewardService.addRewardToMovie(movieId, rewardId, awardReceivedDate), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Remove reward form movie by passing movieId and rewardId")
     @DeleteMapping
-    public ResponseEntity<Void> removeRewardFromMovie(@RequestParam Long movieId, @RequestParam Long rewardId) {
-        movieRewardService.removeRewardFromMovie(movieId, rewardId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<MovieRewardsDto> removeRewardFromMovie(@RequestParam Long movieId, @RequestParam Long rewardId) {
+        return new ResponseEntity<>(movieRewardService.removeRewardFromMovie(movieId, rewardId), HttpStatus.ACCEPTED);
     }
 }

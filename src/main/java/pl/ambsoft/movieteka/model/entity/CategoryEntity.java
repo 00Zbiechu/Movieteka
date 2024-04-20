@@ -1,5 +1,6 @@
 package pl.ambsoft.movieteka.model.entity;
 
+import com.google.common.collect.Lists;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
@@ -10,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -26,5 +26,5 @@ public class CategoryEntity extends BaseEntity {
     private String name;
 
     @ManyToMany(mappedBy = "categoryEntities")
-    private List<MovieEntity> movieEntities = new ArrayList<>();
+    private List<MovieEntity> movieEntities = Lists.newArrayList();
 }

@@ -31,15 +31,15 @@ public class MovieRewardServiceImpl implements MovieRewardService {
         List<MovieRewardEntity> movieRewardEntities = movieRewardRepository.findAllByMovieId(movieId);
         return MovieRewardsDto.builder().movieRewardDtoList(movieRewardEntities.stream()
                         .map(movieReward -> MovieRewardDto.builder()
-                                .id(movieId)
-                                .name(movieReward.getMovieRewardKey().getMovieEntity().getTitle())
+                                .id(movieReward.getMovieRewardKey().getRewardEntity().getId())
+                                .name(movieReward.getMovieRewardKey().getRewardEntity().getName())
                                 .awardReceivedDate(movieReward.getAwardReceivedDate())
                                 .build()).toList())
                 .build();
     }
 
     @Override
-    public void addRewardToMovie(Long movieId, Long rewardId, LocalDate awardReceivedDate) {
+    public MovieRewardsDto addRewardToMovie(Long movieId, Long rewardId, LocalDate awardReceivedDate) {
         var movieRewardEntity = MovieRewardEntity.builder()
                 .movieRewardKey(MovieRewardKey.builder()
                         .movieEntity(movieRepository.findById(movieId).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)))
@@ -55,14 +55,16 @@ public class MovieRewardServiceImpl implements MovieRewardService {
                 }
         );
         movieRewardRepository.save(movieRewardEntity);
+        return getAllRewardsForMovie(movieId);
     }
 
     @Override
-    public void removeRewardFromMovie(Long movieId, Long rewardId) {
+    public MovieRewardsDto removeRewardFromMovie(Long movieId, Long rewardId) {
         var movieRewardEntity = movieRewardRepository.findById(MovieRewardKey.builder()
                 .movieEntity(movieRepository.findById(movieId).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)))
                 .rewardEntity(rewardRepository.findById(rewardId).orElseThrow(() -> new CustomErrorException("reward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)))
                 .build()).orElseThrow(() -> new CustomErrorException("movieReward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST));
         movieRewardRepository.delete(movieRewardEntity);
+        return getAllRewardsForMovie(movieId);
     }
 }

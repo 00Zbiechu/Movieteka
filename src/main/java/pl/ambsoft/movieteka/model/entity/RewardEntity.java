@@ -1,5 +1,6 @@
 package pl.ambsoft.movieteka.model.entity;
 
+import com.google.common.collect.Lists;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -10,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -26,5 +26,5 @@ public class RewardEntity extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "movieRewardKey.rewardEntity")
-    private List<MovieRewardEntity> movieRewardEntities = new ArrayList<>();
+    private List<MovieRewardEntity> movieRewardEntities = Lists.newArrayList();
 }

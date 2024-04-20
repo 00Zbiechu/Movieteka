@@ -1,5 +1,6 @@
 package pl.ambsoft.movieteka.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,9 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @Operation(summary = "Get all categories")
     @GetMapping
-    public ResponseEntity<CategoriesDto> getAllCategory() {
+    public ResponseEntity<CategoriesDto> getAllCategories() {
         return new ResponseEntity<>(categoryService.getAllCategories(), HttpStatus.OK);
     }
 }

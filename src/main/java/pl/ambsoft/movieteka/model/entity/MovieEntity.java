@@ -1,5 +1,6 @@
 package pl.ambsoft.movieteka.model.entity;
 
+import com.google.common.collect.Lists;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -46,8 +46,8 @@ public class MovieEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<CategoryEntity> categoryEntities = new ArrayList<>();
+    private List<CategoryEntity> categoryEntities = Lists.newArrayList();
 
     @OneToMany(mappedBy = "movieRewardKey.movieEntity", cascade = CascadeType.REMOVE)
-    private List<MovieRewardEntity> movieRewardEntities = new ArrayList<>();
+    private List<MovieRewardEntity> movieRewardEntities = Lists.newArrayList();
 }
