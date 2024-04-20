@@ -73,7 +73,6 @@ public abstract class MovieMapperDecorator implements MovieMapper {
         movieEntity.setYearOfProduction(movieDto.getYearOfProduction());
         movieEntity.setDescription(movieDto.getDescription());
         movieEntity.setReview(movieDto.getReview());
-        movieEntity.setPhoto(movieDto.getPhoto());
         setCategoriesForMovieEntity(movieDto, movieEntity);
     }
 }
