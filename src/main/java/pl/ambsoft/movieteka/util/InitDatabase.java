@@ -2,9 +2,20 @@ package pl.ambsoft.movieteka.util;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import pl.ambsoft.movieteka.exception.CustomErrorException;
+import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
 import pl.ambsoft.movieteka.model.entity.CategoryEntity;
 import pl.ambsoft.movieteka.repository.CategoryRepository;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -12,8 +23,6 @@ public class InitDatabase {
 
     private final CategoryRepository categoryRepository;
 
-    //TODO: Not working in docker-compose
-    /*
     @Value("${csv.category.init.path}")
     private String categoryInitPath;
 
@@ -38,23 +47,5 @@ public class InitDatabase {
         } catch (IOException e) {
             throw new CustomErrorException(e.getMessage(), ErrorCodes.FILE_ERROR, HttpStatus.NO_CONTENT);
         }
-    }
-    */
-
-    @PostConstruct
-    private void initDatabaseWithMovieCategory() {
-        categoryRepository.save(CategoryEntity.builder().name("action").build());
-        categoryRepository.save(CategoryEntity.builder().name("anime").build());
-        categoryRepository.save(CategoryEntity.builder().name("drama").build());
-        categoryRepository.save(CategoryEntity.builder().name("fantasy").build());
-        categoryRepository.save(CategoryEntity.builder().name("horror").build());
-        categoryRepository.save(CategoryEntity.builder().name("criminal").build());
-        categoryRepository.save(CategoryEntity.builder().name("sci-fi").build());
-        categoryRepository.save(CategoryEntity.builder().name("sport").build());
-        categoryRepository.save(CategoryEntity.builder().name("thriller").build());
-        categoryRepository.save(CategoryEntity.builder().name("comedy").build());
-        categoryRepository.save(CategoryEntity.builder().name("musical").build());
-        categoryRepository.save(CategoryEntity.builder().name("adventure").build());
-        categoryRepository.save(CategoryEntity.builder().name("western").build());
     }
 }
