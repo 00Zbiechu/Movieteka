@@ -14,5 +14,5 @@ import java.util.List;
 @Builder
 public class ErrorList {
 
-    private List<ErrorDto> errorDtoList;
+    private List<ErrorDto> errorList;
 }

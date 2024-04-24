@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomErrorException.class)
     public ResponseEntity<ErrorList> handleCustomErrorException(CustomErrorException ex) {
         ErrorDto errorDTO = ErrorDto.builder().field(ex.getField()).errorCodes(ex.getErrorCode()).build();
-        return ResponseEntity.status(ex.getHttpStatus()).body(ErrorList.builder().errorDtoList(List.of(errorDTO)).build());
+        return ResponseEntity.status(ex.getHttpStatus()).body(ErrorList.builder().errorList(List.of(errorDTO)).build());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -29,6 +29,6 @@ public class GlobalExceptionHandler {
             var fieldName = ((FieldError) error).getField();
             errorList.add(ErrorDto.builder().field(fieldName).errorCodes(ErrorCodes.FIELD_ERROR).build());
         });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorList.builder().errorDtoList(errorList).build());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorList.builder().errorList(errorList).build());
     }
 }

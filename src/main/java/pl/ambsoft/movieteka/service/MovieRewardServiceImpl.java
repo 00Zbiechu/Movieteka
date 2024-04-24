@@ -29,7 +29,7 @@ public class MovieRewardServiceImpl implements MovieRewardService {
     @Override
     public MovieRewardsDto getAllRewardsForMovie(Long movieId) {
         List<MovieRewardEntity> movieRewardEntities = movieRewardRepository.findAllByMovieId(movieId);
-        return MovieRewardsDto.builder().movieRewardDtoList(movieRewardEntities.stream()
+        return MovieRewardsDto.builder().movieRewards(movieRewardEntities.stream()
                         .map(movieReward -> MovieRewardDto.builder()
                                 .id(movieReward.getMovieRewardKey().getRewardEntity().getId())
                                 .name(movieReward.getMovieRewardKey().getRewardEntity().getName())

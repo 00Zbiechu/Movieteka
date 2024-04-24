@@ -1,4 +1,4 @@
-package pl.ambsoft.movieteka.validatior;
+package pl.ambsoft.movieteka.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +30,9 @@ public class RewardValidator implements Validator {
 
     private void validateIsNameUnique(RewardsDto rewardsDto) {
         for (RewardDto rewardDto : rewardsDto.rewards()) {
+            if (rewardDto.name() == null) {
+                throw new CustomErrorException("reward", ErrorCodes.FIELD_ERROR, HttpStatus.BAD_REQUEST);
+            }
             rewardRepository.findByName(rewardDto.name()).ifPresent(reward -> {
                         throw new CustomErrorException(reward.getName(), ErrorCodes.ENTITY_ALREADY_EXIST, HttpStatus.BAD_REQUEST);
                     }

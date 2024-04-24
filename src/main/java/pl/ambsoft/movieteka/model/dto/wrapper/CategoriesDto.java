@@ -1,6 +1,5 @@
 package pl.ambsoft.movieteka.model.dto.wrapper;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +16,5 @@ import java.util.Set;
 @Builder
 public class CategoriesDto {
 
-    @NotNull
     private Set<CategoryDto> categories;
 }

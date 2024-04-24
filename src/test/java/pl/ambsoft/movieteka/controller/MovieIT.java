@@ -10,9 +10,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.ambsoft.movieteka.BaseTest;
+import pl.ambsoft.movieteka.model.dto.AddMovieDto;
 import pl.ambsoft.movieteka.model.dto.CategoryDto;
+import pl.ambsoft.movieteka.model.dto.EditMovieDto;
 import pl.ambsoft.movieteka.model.dto.MovieDto;
-import pl.ambsoft.movieteka.model.dto.wrapper.CategoriesDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.MoviesDto;
 import pl.ambsoft.movieteka.model.entity.CategoryEntity;
 import pl.ambsoft.movieteka.model.entity.MovieEntity;
@@ -31,7 +32,7 @@ class MovieIT extends BaseTest {
 
     private final String PATH = "/api/movie";
 
-    @DisplayName("Should get all movies")
+    @DisplayName("Should get all movieRewards")
     @Test
     void shouldGetAllMovies() throws Exception {
 
@@ -63,24 +64,32 @@ class MovieIT extends BaseTest {
     void shouldAddNewMovie() throws Exception {
 
         //given
-        var movie = MovieDto.builder()
+        var movie = AddMovieDto.builder()
                 .title("Test")
                 .description("Very nice movie")
                 .review(5.0f)
                 .yearOfProduction((short) 2004)
-                .categoriesDto(
-                        CategoriesDto.builder()
-                                .categories(
-                                        Set.of(CategoryDto.builder()
-                                                .name("horror")
-                                                .build()
-                                        )
-                                ).build()
-                )
-                .build();
+                .categories(
+                        Set.of(CategoryDto.builder()
+                                .name("horror")
+                                .build()
+                        )
+                ).build();
+
+        var expectedMovie = MovieDto.builder()
+                .title("Test")
+                .description("Very nice movie")
+                .review(5.0f)
+                .yearOfProduction((short) 2004)
+                .categories(
+                        Set.of(CategoryDto.builder()
+                                .name("horror")
+                                .build()
+                        )
+                ).build();
 
         var movieJson = new MockMultipartFile(
-                "movieDto",
+                "addMovieDto",
                 null,
                 "application/json",
                 asJson(movie).getBytes()
@@ -89,7 +98,7 @@ class MovieIT extends BaseTest {
         var expectedMovieList = List.of(
                 MoviesDto.builder()
                         .movies(
-                                List.of(movie))
+                                List.of(expectedMovie))
                         .build()
         );
 
@@ -114,7 +123,7 @@ class MovieIT extends BaseTest {
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getReview(), result.movies().get(0).getReview()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getDescription(), result.movies().get(0).getDescription()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategoriesDto().getCategories().size(), result.movies().get(0).getCategoriesDto().getCategories().size())
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategories().size(), result.movies().get(0).getCategories().size())
         );
     }
 
@@ -123,21 +132,17 @@ class MovieIT extends BaseTest {
     @ParameterizedTest
     void shouldReturnBadRequestWhenAddMovieEndpointIsUsed(String title, String description, Float review, Short yearOfProduction, String category) throws Exception {
 
-        var movie = MovieDto.builder()
+        var movie = AddMovieDto.builder()
                 .title(title)
                 .description(description)
                 .review(review)
                 .yearOfProduction(yearOfProduction)
-                .categoriesDto(
-                        CategoriesDto.builder()
-                                .categories(
-                                        Set.of(CategoryDto.builder()
-                                                .name(category)
-                                                .build()
-                                        )
-                                ).build()
-                )
-                .build();
+                .categories(
+                        Set.of(CategoryDto.builder()
+                                .name(category)
+                                .build()
+                        )
+                ).build();
 
         entityManager.persist(MovieEntity.builder()
                 .title("Test")
@@ -260,25 +265,21 @@ class MovieIT extends BaseTest {
 
         entityManager.persist(movieEntity);
 
-        var movieDto = MovieDto.builder()
+        var movieDto = EditMovieDto.builder()
                 .id(movieEntity.getId())
                 .title("Test edit")
                 .description("Very nice movie edit")
                 .review(4.0f)
                 .yearOfProduction((short) 2003)
-                .categoriesDto(
-                        CategoriesDto.builder()
-                                .categories(
-                                        Set.of(CategoryDto.builder()
-                                                        .name("melodrama")
-                                                        .build(),
-                                                CategoryDto.builder()
-                                                        .name("horror")
-                                                        .build()
-                                        )
-                                ).build()
-                )
-                .build();
+                .categories(
+                        Set.of(CategoryDto.builder()
+                                        .name("melodrama")
+                                        .build(),
+                                CategoryDto.builder()
+                                        .name("horror")
+                                        .build()
+                        )
+                ).build();
 
         //when
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, PATH)
@@ -294,12 +295,12 @@ class MovieIT extends BaseTest {
                 () -> Assertions.assertEquals(movieDto.getReview(), result.movies().get(0).getReview()),
                 () -> Assertions.assertEquals(movieDto.getDescription(), result.movies().get(0).getDescription()),
                 () -> Assertions.assertEquals(movieDto.getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(movieDto.getCategoriesDto().getCategories().size(), result.movies().get(0).getCategoriesDto().getCategories().size())
+                () -> Assertions.assertEquals(movieDto.getCategories().size(), result.movies().get(0).getCategories().size())
         );
     }
 
 
-    @DisplayName("Should filter movies by category and find movies")
+    @DisplayName("Should filter movieRewards by category and find movieRewards")
     @ParameterizedTest
     @MethodSource("filterTestArguments")
     void shouldFilterMoviesAndByCategoryAndFindMovies(String category, int size) throws Exception {

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import pl.ambsoft.movieteka.validatior.FileValidator;
+import pl.ambsoft.movieteka.validator.FileValidator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

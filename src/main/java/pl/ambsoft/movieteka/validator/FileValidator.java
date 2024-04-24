@@ -1,4 +1,4 @@
-package pl.ambsoft.movieteka.validatior;
+package pl.ambsoft.movieteka.validator;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

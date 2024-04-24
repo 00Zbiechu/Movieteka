@@ -9,9 +9,10 @@ import pl.ambsoft.movieteka.exception.CustomErrorException;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
 import pl.ambsoft.movieteka.mapper.CategoryMapper;
 import pl.ambsoft.movieteka.mapper.MovieMapper;
+import pl.ambsoft.movieteka.model.dto.AddMovieDto;
 import pl.ambsoft.movieteka.model.dto.CategoryDto;
+import pl.ambsoft.movieteka.model.dto.EditMovieDto;
 import pl.ambsoft.movieteka.model.dto.MovieDto;
-import pl.ambsoft.movieteka.model.dto.wrapper.CategoriesDto;
 import pl.ambsoft.movieteka.model.entity.CategoryEntity;
 import pl.ambsoft.movieteka.model.entity.MovieEntity;
 import pl.ambsoft.movieteka.repository.CategoryRepository;
@@ -32,15 +33,15 @@ public abstract class MovieMapperDecorator implements MovieMapper {
     private CategoryRepository categoryRepository;
 
     @Override
-    public MovieEntity toEntity(MovieDto dto) {
+    public MovieEntity toEntity(AddMovieDto dto) {
         var movieEntity = movieMapper.toEntity(dto);
         setCategoriesForMovieEntity(dto, movieEntity);
         return movieEntity;
     }
 
-    private void setCategoriesForMovieEntity(MovieDto dto, MovieEntity movieEntity) {
+    private void setCategoriesForMovieEntity(AddMovieDto dto, MovieEntity movieEntity) {
         List<CategoryEntity> categoryEntityList = Lists.newArrayList();
-        for (CategoryDto categoryDto : dto.getCategoriesDto().getCategories()) {
+        for (CategoryDto categoryDto : dto.getCategories()) {
             categoryEntityList.add(categoryRepository.findByName(categoryDto.name()).orElseThrow(() -> new CustomErrorException("category", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)));
         }
         movieEntity.setCategoryEntities(categoryEntityList);
@@ -59,20 +60,16 @@ public abstract class MovieMapperDecorator implements MovieMapper {
             categoriesSet.add(categoryMapper.toDto(categoryEntity));
         }
 
-        if (movieDto.getCategoriesDto() == null) {
-            movieDto.setCategoriesDto(new CategoriesDto());
+        if (movieDto.getCategories() == null) {
+            movieDto.setCategories(Sets.newHashSet());
         }
 
-        movieDto.getCategoriesDto().setCategories(categoriesSet);
+        movieDto.setCategories(categoriesSet);
     }
 
     @Override
-    public void updateMovieEntityWithMovieDto(MovieEntity movieEntity, MovieDto movieDto) {
-        movieEntity.setId(movieDto.getId());
-        movieEntity.setTitle(movieDto.getTitle());
-        movieEntity.setYearOfProduction(movieDto.getYearOfProduction());
-        movieEntity.setDescription(movieDto.getDescription());
-        movieEntity.setReview(movieDto.getReview());
-        setCategoriesForMovieEntity(movieDto, movieEntity);
+    public void updateMovieEntityWithEditMovieDto(EditMovieDto editMovieDto, MovieEntity movieEntity) {
+        movieMapper.updateMovieEntityWithEditMovieDto(editMovieDto, movieEntity);
+        setCategoriesForMovieEntity(editMovieDto, movieEntity);
     }
 }

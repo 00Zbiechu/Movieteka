@@ -28,7 +28,7 @@ class MovieRewardIT extends BaseTest {
 
     private final String PATH = "/api/movie-reward";
 
-    @DisplayName("Should return list of all movies and rewards")
+    @DisplayName("Should return list of all movieRewards and rewards")
     @Test
     void shouldReturnListOfAllMoviesAndRewards() throws Exception {
 
@@ -87,7 +87,7 @@ class MovieRewardIT extends BaseTest {
         //then
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isOk());
-        Assertions.assertEquals(2, result.movieRewardDtoList().size());
+        Assertions.assertEquals(2, result.movieRewards().size());
     }
 
     @DisplayName("Should add reward to movie")
@@ -131,8 +131,8 @@ class MovieRewardIT extends BaseTest {
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isCreated());
         assertAll(
-                () -> assertEquals(1, result.movieRewardDtoList().size()),
-                () -> assertEquals("Oscar", result.movieRewardDtoList().get(0).name())
+                () -> assertEquals(1, result.movieRewards().size()),
+                () -> assertEquals("Oscar", result.movieRewards().get(0).name())
         );
     }
 
@@ -246,7 +246,7 @@ class MovieRewardIT extends BaseTest {
         //then
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isAccepted());
-        Assertions.assertEquals(1, result.movieRewardDtoList().size());
+        Assertions.assertEquals(1, result.movieRewards().size());
     }
 
     @DisplayName("Should not remove reward from movie and return bad request cause wrong data in request param")

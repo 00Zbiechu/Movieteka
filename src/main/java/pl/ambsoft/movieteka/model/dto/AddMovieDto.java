@@ -1,0 +1,47 @@
+package pl.ambsoft.movieteka.model.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+import java.util.Set;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+public class AddMovieDto {
+
+    @Schema(example = "Mad Max Fury Road", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank
+    private String title;
+
+    @Schema(example = "2015", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull
+    private Short yearOfProduction;
+
+    @Schema(example = "Very nice movie", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank
+    private String description;
+
+    @Schema(example = "4.9", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull
+    @Min(0)
+    @Max(5)
+    private Float review;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    @Valid
+    @NotEmpty
+    private Set<CategoryDto> categories;
+}

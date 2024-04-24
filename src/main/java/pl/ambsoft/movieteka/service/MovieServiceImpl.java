@@ -7,7 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.ambsoft.movieteka.exception.CustomErrorException;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
 import pl.ambsoft.movieteka.mapper.MovieMapper;
-import pl.ambsoft.movieteka.model.dto.MovieDto;
+import pl.ambsoft.movieteka.model.dto.AddMovieDto;
+import pl.ambsoft.movieteka.model.dto.EditMovieDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.MoviesDto;
 import pl.ambsoft.movieteka.photo.PhotoCompressor;
 import pl.ambsoft.movieteka.queryservice.MovieQueryService;
@@ -33,8 +34,8 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MoviesDto addNewMovie(MovieDto movieDto, MultipartFile photo) {
-        var movieEntity = movieMapper.toEntity(movieDto);
+    public MoviesDto addNewMovie(AddMovieDto addMovieDto, MultipartFile photo) {
+        var movieEntity = movieMapper.toEntity(addMovieDto);
 
         if (photo != null) {
             try {
@@ -57,9 +58,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MoviesDto editMovie(MovieDto editMovieDto) {
+    public MoviesDto editMovie(EditMovieDto editMovieDto) {
         var movieEntity = movieRepository.findById(editMovieDto.getId()).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST));
-        movieMapper.updateMovieEntityWithMovieDto(movieEntity, editMovieDto);
+        movieMapper.updateMovieEntityWithEditMovieDto(editMovieDto, movieEntity);
         movieRepository.save(movieEntity);
         return getAllMovies();
     }
