@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.ambsoft.movieteka.BaseTest;
 import pl.ambsoft.movieteka.model.dto.AddMovieDto;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 
 import static com.querydsl.codegen.utils.Symbols.EMPTY;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class MovieIT extends BaseTest {
@@ -123,7 +125,8 @@ class MovieIT extends BaseTest {
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getReview(), result.movies().get(0).getReview()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getDescription(), result.movies().get(0).getDescription()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategories().size(), result.movies().get(0).getCategories().size())
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategories().size(), result.movies().get(0).getCategories().size()),
+                () -> assertNotNull(result.movies().get(0).getPhoto())
         );
     }
 
@@ -187,6 +190,83 @@ class MovieIT extends BaseTest {
         );
     }
 
+    @DisplayName("Should edit movie data")
+    @Test
+    void shouldEditMovieData() throws Exception {
+
+        //given
+        var categoryEntity = CategoryEntity.builder().name("horror").build();
+        var categoryEntityTwo = CategoryEntity.builder().name("melodrama").build();
+
+        entityManager.persist(categoryEntityTwo);
+
+        var movieEntity = MovieEntity.builder()
+                .title("Test")
+                .description("Very nice movie")
+                .review(5.0f)
+                .yearOfProduction((short) 2004)
+                .categoryEntities(
+                        List.of(categoryEntity)
+                )
+                .build();
+
+        entityManager.persist(movieEntity);
+
+        var editMovieDto = EditMovieDto.builder()
+                .id(movieEntity.getId())
+                .title("Test edit")
+                .description("Very nice movie edit")
+                .review(4.0f)
+                .yearOfProduction((short) 2003)
+                .categories(
+                        Set.of(CategoryDto.builder()
+                                        .name("melodrama")
+                                        .build(),
+                                CategoryDto.builder()
+                                        .name("horror")
+                                        .build()
+                        )
+                ).build();
+
+        var editMovieJson = new MockMultipartFile(
+                "editMovieDto",
+                null,
+                "application/json",
+                asJson(editMovieDto).getBytes()
+        );
+
+        byte[] imageBytes = Files.readAllBytes(Paths.get("src/main/resources/image/test_image.jpg"));
+
+        MockMultipartFile photo = new MockMultipartFile("photo", "photo.png",
+                "image/png", imageBytes);
+
+        //when
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart(PATH);
+        builder.with(request -> {
+            request.setMethod("PUT");
+            return request;
+        });
+
+        var response = mockMvc.perform(builder
+                .file(editMovieJson)
+                .file(photo)
+        );
+
+        //then
+        var result = asObject(response, MoviesDto.class);
+        response.andExpect(status().isOk());
+        assertAll(
+                () -> Assertions.assertEquals(1, result.movies().size()),
+                () -> Assertions.assertEquals(editMovieDto.getTitle(), result.movies().get(0).getTitle()),
+                () -> Assertions.assertEquals(editMovieDto.getReview(), result.movies().get(0).getReview()),
+                () -> Assertions.assertEquals(editMovieDto.getDescription(), result.movies().get(0).getDescription()),
+                () -> Assertions.assertEquals(editMovieDto.getTitle(), result.movies().get(0).getTitle()),
+                () -> Assertions.assertEquals(editMovieDto.getCategories().size(), result.movies().get(0).getCategories().size()),
+                () -> assertNotNull(result.movies().get(0).getPhoto())
+        );
+    }
+
     @DisplayName("Should delete movie")
     @Test
     void shouldDeleteMovie() throws Exception {
@@ -241,62 +321,6 @@ class MovieIT extends BaseTest {
 
         //then
         response.andExpect(status().isBadRequest());
-    }
-
-    @DisplayName("Should edit movie data")
-    @Test
-    void shouldEditMovieData() throws Exception {
-
-        //given
-        var categoryEntity = CategoryEntity.builder().name("horror").build();
-        var categoryEntityTwo = CategoryEntity.builder().name("melodrama").build();
-
-        entityManager.persist(categoryEntityTwo);
-
-        var movieEntity = MovieEntity.builder()
-                .title("Test")
-                .description("Very nice movie")
-                .review(5.0f)
-                .yearOfProduction((short) 2004)
-                .categoryEntities(
-                        List.of(categoryEntity)
-                )
-                .build();
-
-        entityManager.persist(movieEntity);
-
-        var movieDto = EditMovieDto.builder()
-                .id(movieEntity.getId())
-                .title("Test edit")
-                .description("Very nice movie edit")
-                .review(4.0f)
-                .yearOfProduction((short) 2003)
-                .categories(
-                        Set.of(CategoryDto.builder()
-                                        .name("melodrama")
-                                        .build(),
-                                CategoryDto.builder()
-                                        .name("horror")
-                                        .build()
-                        )
-                ).build();
-
-        //when
-        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, PATH)
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(movieDto)));
-
-        //then
-        var result = asObject(response, MoviesDto.class);
-        response.andExpect(status().isOk());
-        assertAll(
-                () -> Assertions.assertEquals(1, result.movies().size()),
-                () -> Assertions.assertEquals(movieDto.getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(movieDto.getReview(), result.movies().get(0).getReview()),
-                () -> Assertions.assertEquals(movieDto.getDescription(), result.movies().get(0).getDescription()),
-                () -> Assertions.assertEquals(movieDto.getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(movieDto.getCategories().size(), result.movies().get(0).getCategories().size())
-        );
     }
 
 

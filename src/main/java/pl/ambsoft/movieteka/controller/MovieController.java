@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -81,6 +80,22 @@ public class MovieController {
         return new ResponseEntity<>(movieService.addNewMovie(addMovieDto, photo), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Edit existing movie data with optional photo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return list of all movies",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MoviesDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Return error list",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))})
+    })
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MoviesDto> editMovie(
+            @RequestPart(required = false) MultipartFile photo,
+            @Valid @RequestPart EditMovieDto editMovieDto) {
+        return new ResponseEntity<>(movieService.editMovie(editMovieDto, photo), HttpStatus.OK);
+    }
+
     @Operation(summary = "Delete movie by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Return list of all movies",
@@ -93,20 +108,6 @@ public class MovieController {
     @DeleteMapping
     public ResponseEntity<MoviesDto> deleteMovie(@RequestParam @Parameter(description = "Movie ID", example = "1") Long id) {
         return new ResponseEntity<>(movieService.deleteMovie(id), HttpStatus.ACCEPTED);
-    }
-
-    @Operation(summary = "Edit existing movie data")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Return list of all movies",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MoviesDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorList.class))})
-    })
-    @PutMapping
-    public ResponseEntity<MoviesDto> editMovie(@Valid @RequestBody EditMovieDto editMovieDto) {
-        return new ResponseEntity<>(movieService.editMovie(editMovieDto), HttpStatus.OK);
     }
 
     @Operation(summary = "Filter movies by category")

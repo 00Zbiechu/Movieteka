@@ -11,9 +11,9 @@ public interface MovieService {
 
     MoviesDto addNewMovie(AddMovieDto addMovieDto, MultipartFile photo);
 
-    MoviesDto deleteMovie(Long id);
+    MoviesDto editMovie(EditMovieDto editMovieDto, MultipartFile photo);
 
-    MoviesDto editMovie(EditMovieDto editMovieDto);
+    MoviesDto deleteMovie(Long id);
 
     MoviesDto filterMovieByCategory(String category);
 
