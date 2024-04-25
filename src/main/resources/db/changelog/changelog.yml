@@ -14,3 +14,6 @@ databaseChangeLog:
   - include:
       file: ./changes/180420240931_create_table_movie_reward.yml
       relativeToChangelogFile: true
+  - include:
+      file: ./changes/250420241143_create_table_rating.yml
+      relativeToChangelogFile: true

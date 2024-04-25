@@ -2,8 +2,6 @@ package pl.ambsoft.movieteka.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -33,12 +31,6 @@ public class AddMovieDto {
     @Schema(example = "Very nice movie", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     private String description;
-
-    @Schema(example = "4.9", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull
-    @Min(0)
-    @Max(5)
-    private Float review;
 
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @Valid

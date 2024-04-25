@@ -34,11 +34,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: review
-                  type: real
-                  constraints:
-                    nullable: false
-              - column:
                   name: photo
                   type: bytea
 

@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,7 +41,6 @@ class MovieRewardIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -104,7 +102,6 @@ class MovieRewardIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -131,8 +128,8 @@ class MovieRewardIT extends BaseTest {
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isCreated());
         assertAll(
-                () -> assertEquals(1, result.movieRewards().size()),
-                () -> assertEquals("Oscar", result.movieRewards().get(0).name())
+                () -> Assertions.assertEquals(1, result.movieRewards().size()),
+                () -> Assertions.assertEquals("Oscar", result.movieRewards().get(0).name())
         );
     }
 
@@ -151,7 +148,6 @@ class MovieRewardIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -198,7 +194,6 @@ class MovieRewardIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -263,7 +258,6 @@ class MovieRewardIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)

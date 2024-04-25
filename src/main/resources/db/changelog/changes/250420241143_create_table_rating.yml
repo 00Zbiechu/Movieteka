@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_review
+      author: mzbiewski
+      preConditions:
+        - onFail: MARK_RAN
+          and:
+            - not:
+                tableExists:
+                  tableName: "RATING"
+            - tableExists:
+                tableName: "MOVIE"
+      changes:
+        - createTable:
+            tableName: "RATING"
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: REVIEW_ID_PK
+              - column:
+                  name: score
+                  type: real
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: varchar(500)
+              - column:
+                  name: movie_id
+                  type: bigint
+                  constraints:
+                    referencedColumnNames: id
+                    referencedTableName: "MOVIE"
+                    foreignKeyName: "RATING_MOVIE_FK"
+                    nullable: false
+

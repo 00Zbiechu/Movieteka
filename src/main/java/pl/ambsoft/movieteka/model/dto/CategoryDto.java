@@ -7,5 +7,5 @@ import lombok.Builder;
 @Builder
 public record CategoryDto(
         @Schema(example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED) Long id,
-        @Schema(example = "drama", requiredMode = Schema.RequiredMode.REQUIRED) @NotBlank String name) {
+        @Schema(example = "action", requiredMode = Schema.RequiredMode.REQUIRED) @NotBlank String name) {
 }

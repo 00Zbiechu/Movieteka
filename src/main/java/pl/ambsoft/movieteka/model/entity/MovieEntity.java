@@ -35,9 +35,6 @@ public class MovieEntity extends BaseEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private Float review;
-
     private byte[] photo;
 
     @ManyToMany
@@ -48,6 +45,9 @@ public class MovieEntity extends BaseEntity {
     )
     private List<CategoryEntity> categoryEntities = Lists.newArrayList();
 
-    @OneToMany(mappedBy = "movieRewardKey.movieEntity", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "movieRewardKey.movieEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<MovieRewardEntity> movieRewardEntities = Lists.newArrayList();
+
+    @OneToMany(mappedBy = "movieEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<RatingEntity> ratingEntities = Lists.newArrayList();
 }

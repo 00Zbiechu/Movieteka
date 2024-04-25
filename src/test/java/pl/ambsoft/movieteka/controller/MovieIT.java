@@ -42,7 +42,6 @@ class MovieIT extends BaseTest {
         entityManager.persist(MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(CategoryEntity.builder()
@@ -69,7 +68,6 @@ class MovieIT extends BaseTest {
         var movie = AddMovieDto.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categories(
                         Set.of(CategoryDto.builder()
@@ -81,7 +79,6 @@ class MovieIT extends BaseTest {
         var expectedMovie = MovieDto.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categories(
                         Set.of(CategoryDto.builder()
@@ -122,7 +119,6 @@ class MovieIT extends BaseTest {
         assertAll(
                 () -> Assertions.assertEquals(1, result.movies().size()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getReview(), result.movies().get(0).getReview()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getDescription(), result.movies().get(0).getDescription()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategories().size(), result.movies().get(0).getCategories().size()),
@@ -138,7 +134,6 @@ class MovieIT extends BaseTest {
         var movie = AddMovieDto.builder()
                 .title(title)
                 .description(description)
-                .review(review)
                 .yearOfProduction(yearOfProduction)
                 .categories(
                         Set.of(CategoryDto.builder()
@@ -150,7 +145,6 @@ class MovieIT extends BaseTest {
         entityManager.persist(MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(CategoryEntity.builder()
@@ -203,7 +197,6 @@ class MovieIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -216,7 +209,6 @@ class MovieIT extends BaseTest {
                 .id(movieEntity.getId())
                 .title("Test edit")
                 .description("Very nice movie edit")
-                .review(4.0f)
                 .yearOfProduction((short) 2003)
                 .categories(
                         Set.of(CategoryDto.builder()
@@ -259,7 +251,6 @@ class MovieIT extends BaseTest {
         assertAll(
                 () -> Assertions.assertEquals(1, result.movies().size()),
                 () -> Assertions.assertEquals(editMovieDto.getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(editMovieDto.getReview(), result.movies().get(0).getReview()),
                 () -> Assertions.assertEquals(editMovieDto.getDescription(), result.movies().get(0).getDescription()),
                 () -> Assertions.assertEquals(editMovieDto.getTitle(), result.movies().get(0).getTitle()),
                 () -> Assertions.assertEquals(editMovieDto.getCategories().size(), result.movies().get(0).getCategories().size()),
@@ -275,7 +266,6 @@ class MovieIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(CategoryEntity.builder()
@@ -304,7 +294,6 @@ class MovieIT extends BaseTest {
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(CategoryEntity.builder()
@@ -341,7 +330,6 @@ class MovieIT extends BaseTest {
         var movieEntityHorrorOne = MovieEntity.builder()
                 .title("TestOne")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -351,7 +339,6 @@ class MovieIT extends BaseTest {
         var movieEntityHorrorTwo = MovieEntity.builder()
                 .title("TestTwo")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -361,7 +348,6 @@ class MovieIT extends BaseTest {
         var movieEntityMelodramaThree = MovieEntity.builder()
                 .title("TestThree")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntityTwo)
@@ -404,7 +390,6 @@ class MovieIT extends BaseTest {
         var movieEntityHorrorOne = MovieEntity.builder()
                 .title("TestOne")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
@@ -414,7 +399,6 @@ class MovieIT extends BaseTest {
         var movieEntityHorrorTwo = MovieEntity.builder()
                 .title("TestTwo")
                 .description("Very nice movie")
-                .review(5.0f)
                 .yearOfProduction((short) 2004)
                 .categoryEntities(
                         List.of(categoryEntity)
