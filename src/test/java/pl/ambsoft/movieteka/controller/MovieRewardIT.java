@@ -9,6 +9,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.ambsoft.movieteka.BaseTest;
+import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
+import pl.ambsoft.movieteka.exception.wrapper.ErrorList;
 import pl.ambsoft.movieteka.model.dto.wrapper.MovieRewardsDto;
 import pl.ambsoft.movieteka.model.entity.CategoryEntity;
 import pl.ambsoft.movieteka.model.entity.MovieEntity;
@@ -27,9 +29,9 @@ class MovieRewardIT extends BaseTest {
 
     private final String PATH = "/api/movie-reward";
 
-    @DisplayName("Should return list of all movieRewards and rewards")
+    @DisplayName("Should return list of all movies with rewards")
     @Test
-    void shouldReturnListOfAllMoviesAndRewards() throws Exception {
+    void shouldReturnListOfAllMoviesWithRewards() throws Exception {
 
         //given
         var categoryEntity = CategoryEntity.builder()
@@ -85,7 +87,15 @@ class MovieRewardIT extends BaseTest {
         //then
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isOk());
-        Assertions.assertEquals(2, result.movieRewards().size());
+        assertAll(
+                () -> Assertions.assertEquals(2, result.movieRewards().size()),
+                () -> Assertions.assertEquals(rewardEntity.getId(), result.movieRewards().get(0).id()),
+                () -> Assertions.assertEquals(rewardEntity.getName(), result.movieRewards().get(0).name()),
+                () -> Assertions.assertEquals(LocalDate.now(), result.movieRewards().get(0).awardReceivedDate()),
+                () -> Assertions.assertEquals(rewardEntityTwo.getId(), result.movieRewards().get(1).id()),
+                () -> Assertions.assertEquals(rewardEntityTwo.getName(), result.movieRewards().get(1).name()),
+                () -> Assertions.assertEquals(LocalDate.now(), result.movieRewards().get(1).awardReceivedDate())
+        );
     }
 
     @DisplayName("Should add reward to movie")
@@ -129,7 +139,8 @@ class MovieRewardIT extends BaseTest {
         response.andExpect(status().isCreated());
         assertAll(
                 () -> Assertions.assertEquals(1, result.movieRewards().size()),
-                () -> Assertions.assertEquals("Oscar", result.movieRewards().get(0).name())
+                () -> Assertions.assertEquals(rewardEntity.getName(), result.movieRewards().get(0).name()),
+                () -> Assertions.assertEquals(LocalDate.now(), result.movieRewards().get(0).awardReceivedDate())
         );
     }
 
@@ -170,7 +181,7 @@ class MovieRewardIT extends BaseTest {
         );
 
         //then
-        response.andExpect(status().isBadRequest());
+        response.andExpect(status().isNotFound());
     }
 
     private static Stream<Arguments> addMovieRewardsTestArguments() {
@@ -240,7 +251,7 @@ class MovieRewardIT extends BaseTest {
 
         //then
         var result = asObject(response, MovieRewardsDto.class);
-        response.andExpect(status().isAccepted());
+        response.andExpect(status().isOk());
         Assertions.assertEquals(1, result.movieRewards().size());
     }
 
@@ -299,10 +310,16 @@ class MovieRewardIT extends BaseTest {
         //when
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH)
                 .param("movieId", String.valueOf(movieEntity.getId() + 1L))
-                .param("rewardId", String.valueOf(rewardEntity.getId() + 1L))
+                .param("rewardId", rewardEntity.getId().toString())
         );
 
         //then
+        var result = asObject(response, ErrorList.class);
         response.andExpect(status().isBadRequest());
+        assertAll(
+                () -> Assertions.assertEquals(1, result.getErrorList().size()),
+                () -> Assertions.assertEquals("movie", result.getErrorList().get(0).getField()),
+                () -> Assertions.assertEquals(ErrorCodes.ENTITY_DOES_NOT_EXIST, result.getErrorList().get(0).getErrorCodes())
+        );
     }
 }

@@ -45,17 +45,14 @@ public class RewardController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns all rewards",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = RewardsDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorList.class))})
+                            schema = @Schema(implementation = RewardsDto.class))})
     })
     @GetMapping
     public ResponseEntity<RewardsDto> getRewards() {
         return new ResponseEntity<>(rewardService.getRewards(), HttpStatus.OK);
     }
 
-    @Operation(summary = "Add new reward")
+    @Operation(summary = "Add new rewards")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Returns all rewards",
                     content = {@Content(mediaType = "application/json",
@@ -71,15 +68,15 @@ public class RewardController {
 
     @Operation(summary = "Delete reward by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Returns all rewards",
+            @ApiResponse(responseCode = "200", description = "Returns all rewards",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = RewardsDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
+            @ApiResponse(responseCode = "404", description = "Reward does not exist",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
     @DeleteMapping
     public ResponseEntity<RewardsDto> deleteReward(@RequestParam @Parameter(description = "Reward ID", example = "1") Long id) {
-        return new ResponseEntity<>(rewardService.deleteReward(id), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(rewardService.deleteReward(id), HttpStatus.OK);
     }
 }

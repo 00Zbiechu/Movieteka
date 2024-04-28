@@ -45,7 +45,7 @@ public class InitDatabase {
                 }
             }
         } catch (IOException e) {
-            throw new CustomErrorException(e.getMessage(), ErrorCodes.FILE_ERROR, HttpStatus.NO_CONTENT);
+            throw new CustomErrorException(e.getMessage(), ErrorCodes.FILE_ERROR, HttpStatus.BAD_REQUEST);
         }
     }
 }

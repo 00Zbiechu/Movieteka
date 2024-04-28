@@ -36,5 +36,4 @@ databaseChangeLog:
                     referencedColumnNames: id
                     referencedTableName: "MOVIE"
                     foreignKeyName: "RATING_MOVIE_FK"
-                    nullable: false
 

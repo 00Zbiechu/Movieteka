@@ -1,6 +1,7 @@
 package pl.ambsoft.movieteka.validator;
 
 
+import com.google.common.collect.Sets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,8 @@ import pl.ambsoft.movieteka.model.dto.CategoryDto;
 import pl.ambsoft.movieteka.model.dto.MovieDto;
 import pl.ambsoft.movieteka.repository.CategoryRepository;
 import pl.ambsoft.movieteka.repository.MovieRepository;
+
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class AddMovieValidator implements Validator {
         var dto = (AddMovieDto) target;
         validateIsMovieTitleUnique(dto);
         validateIsCategoryListIsNotNull(dto);
+        validateIsCategoryListDoesNotContainDuplicate(dto);
         validateIsCategoriesExist(dto);
     }
 
@@ -47,12 +51,21 @@ public class AddMovieValidator implements Validator {
         }
     }
 
+    private void validateIsCategoryListDoesNotContainDuplicate(AddMovieDto dto) {
+        Set<CategoryDto> categoryDtoSet = Sets.newHashSet();
+        for (CategoryDto categoryDto : dto.getCategories()) {
+            if (!categoryDtoSet.add(categoryDto)) {
+                throw new CustomErrorException("category", ErrorCodes.DUPLICATE_NAME, HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
     protected void validateIsCategoriesExist(AddMovieDto dto) {
         for (CategoryDto categoryDto : dto.getCategories()) {
             if (categoryDto.name() == null) {
                 throw new CustomErrorException("category", ErrorCodes.FIELD_ERROR, HttpStatus.BAD_REQUEST);
             }
-            categoryRepository.findByName(categoryDto.name()).orElseThrow(() -> new CustomErrorException(categoryDto.name(), ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST));
+            categoryRepository.findByName(categoryDto.name()).orElseThrow(() -> new CustomErrorException(categoryDto.name(), ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
         }
     }
 }

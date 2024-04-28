@@ -22,7 +22,6 @@ import pl.ambsoft.movieteka.model.entity.MovieEntity;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.querydsl.codegen.utils.Symbols.EMPTY;
@@ -34,12 +33,12 @@ class MovieIT extends BaseTest {
 
     private final String PATH = "/api/movie";
 
-    @DisplayName("Should get all movieRewards")
+    @DisplayName("Should return all movies")
     @Test
-    void shouldGetAllMovies() throws Exception {
+    void shouldReturnAllMovies() throws Exception {
 
         //given
-        entityManager.persist(MovieEntity.builder()
+        var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
                 .yearOfProduction((short) 2004)
@@ -49,7 +48,9 @@ class MovieIT extends BaseTest {
                                 .build()
                         )
                 )
-                .build());
+                .build();
+
+        entityManager.persist(movieEntity);
 
         //when
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH));
@@ -57,7 +58,15 @@ class MovieIT extends BaseTest {
         //then
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
-        Assertions.assertEquals(1, result.movies().size());
+        assertAll(
+                () -> Assertions.assertEquals(1, result.movies().size()),
+                () -> Assertions.assertEquals(movieEntity.getId(), result.movies().get(0).getId()),
+                () -> Assertions.assertEquals(movieEntity.getTitle(), result.movies().get(0).getTitle()),
+                () -> Assertions.assertEquals(movieEntity.getDescription(), result.movies().get(0).getDescription()),
+                () -> Assertions.assertEquals(movieEntity.getYearOfProduction(), result.movies().get(0).getYearOfProduction()),
+                () -> Assertions.assertEquals(movieEntity.getCategoryEntities().size(), result.movies().get(0).getCategories().size()),
+                () -> Assertions.assertEquals(movieEntity.getCategoryEntities().get(0).getName(), result.movies().get(0).getCategories().get(0).name())
+        );
     }
 
     @DisplayName("Should add new movie")
@@ -70,7 +79,7 @@ class MovieIT extends BaseTest {
                 .description("Very nice movie")
                 .yearOfProduction((short) 2004)
                 .categories(
-                        Set.of(CategoryDto.builder()
+                        List.of(CategoryDto.builder()
                                 .name("horror")
                                 .build()
                         )
@@ -81,7 +90,7 @@ class MovieIT extends BaseTest {
                 .description("Very nice movie")
                 .yearOfProduction((short) 2004)
                 .categories(
-                        Set.of(CategoryDto.builder()
+                        List.of(CategoryDto.builder()
                                 .name("horror")
                                 .build()
                         )
@@ -129,14 +138,14 @@ class MovieIT extends BaseTest {
     @DisplayName("Should return bad request when add movie endpoint is used cause wrong data in request body")
     @MethodSource("addMovieTestArguments")
     @ParameterizedTest
-    void shouldReturnBadRequestWhenAddMovieEndpointIsUsed(String title, String description, Float review, Short yearOfProduction, String category) throws Exception {
+    void shouldReturnBadRequestWhenAddMovieEndpointIsUsed(String title, String description, Short yearOfProduction, String category) throws Exception {
 
         var movie = AddMovieDto.builder()
                 .title(title)
                 .description(description)
                 .yearOfProduction(yearOfProduction)
                 .categories(
-                        Set.of(CategoryDto.builder()
+                        List.of(CategoryDto.builder()
                                 .name(category)
                                 .build()
                         )
@@ -172,15 +181,14 @@ class MovieIT extends BaseTest {
 
     private static Stream<Arguments> addMovieTestArguments() {
         return Stream.of(
-                Arguments.of("Test", "Very nice movie", 4.4f, (short) 2004, "horror"),
-                Arguments.of(EMPTY, "Very nice movie", 4.4f, (short) 2004, "horror"),
-                Arguments.of(null, "Very nice movie", 4.4f, (short) 2004, "horror"),
-                Arguments.of("Title", EMPTY, 4.4f, (short) 2004, "horror"),
-                Arguments.of("Title", null, 4.4f, (short) 2004, "horror"),
-                Arguments.of("Title", "Very nice movie", null, (short) 2004, "horror"),
-                Arguments.of("Title", "Very nice movie", 4.4f, null, "horror"),
-                Arguments.of("Title", "Very nice movie", 4.4f, (short) 2004, null),
-                Arguments.of("Title", "Very nice movie", 4.4f, (short) 2004, "melodrama")
+                Arguments.of("Test", "Very nice movie", (short) 2004, "horror"),
+                Arguments.of(EMPTY, "Very nice movie", (short) 2004, "horror"),
+                Arguments.of(null, "Very nice movie", (short) 2004, "horror"),
+                Arguments.of("Title", EMPTY, (short) 2004, "horror"),
+                Arguments.of("Title", "Very nice movie", (short) 2004, "horror"),
+                Arguments.of("Title", "Very nice movie", null, "horror"),
+                Arguments.of("Title", "Very nice movie", (short) 2004, null),
+                Arguments.of("Title", "Very nice movie", (short) 2004, "melodrama")
         );
     }
 
@@ -211,7 +219,7 @@ class MovieIT extends BaseTest {
                 .description("Very nice movie edit")
                 .yearOfProduction((short) 2003)
                 .categories(
-                        Set.of(CategoryDto.builder()
+                        List.of(CategoryDto.builder()
                                         .name("melodrama")
                                         .build(),
                                 CategoryDto.builder()
@@ -282,11 +290,11 @@ class MovieIT extends BaseTest {
 
         //then
         var result = asObject(response, MoviesDto.class);
-        response.andExpect(status().isAccepted());
+        response.andExpect(status().isOk());
         Assertions.assertEquals(0, result.movies().size());
     }
 
-    @DisplayName("Should delete movie cause entity does not exist")
+    @DisplayName("Should not delete movie cause entity does not exist")
     @Test
     void shouldNotDeleteMovieCauseEntityDoesNotExist() throws Exception {
 
@@ -309,7 +317,7 @@ class MovieIT extends BaseTest {
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH).param("id", String.valueOf(movieEntity.getId() + 1)));
 
         //then
-        response.andExpect(status().isBadRequest());
+        response.andExpect(status().isNotFound());
     }
 
 

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,5 +35,5 @@ public class AddMovieDto {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @Valid
     @NotEmpty
-    private Set<CategoryDto> categories;
+    private List<CategoryDto> categories;
 }

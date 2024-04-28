@@ -6,8 +6,9 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import pl.ambsoft.movieteka.model.dto.RewardDto;
 
-import java.util.Set;
+import java.util.List;
 
 @Builder
-public record RewardsDto(@Schema(requiredMode = Schema.RequiredMode.REQUIRED) @Valid @NotEmpty Set<RewardDto> rewards) {
+public record RewardsDto(
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) @Valid @NotEmpty List<RewardDto> rewards) {
 }

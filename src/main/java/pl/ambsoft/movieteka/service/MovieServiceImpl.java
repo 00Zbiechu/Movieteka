@@ -51,7 +51,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MoviesDto editMovie(EditMovieDto editMovieDto, MultipartFile photo) {
-        var movieEntity = movieRepository.findById(editMovieDto.getId()).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST));
+        var movieEntity = movieRepository.findById(editMovieDto.getId()).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
         movieMapper.updateMovieEntityWithEditMovieDto(editMovieDto, movieEntity);
         setPhotoForMovieEntity(photo, movieEntity);
         movieRepository.save(movieEntity);
@@ -71,7 +71,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MoviesDto deleteMovie(Long id) {
-        var movieEntity = movieRepository.findById(id).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST));
+        var movieEntity = movieRepository.findById(id).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
         movieRepository.delete(movieEntity);
         return getAllMovies();
     }

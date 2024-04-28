@@ -35,7 +35,7 @@ public class RatingController {
             @ApiResponse(responseCode = "200", description = "Return list of ratings for movie by id",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = RatingsDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
+            @ApiResponse(responseCode = "404", description = "Movie does not exist",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
@@ -50,6 +50,9 @@ public class RatingController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = RatingsDto.class))}),
             @ApiResponse(responseCode = "400", description = "Return error list",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))}),
+            @ApiResponse(responseCode = "404", description = "Movie does not exist",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })

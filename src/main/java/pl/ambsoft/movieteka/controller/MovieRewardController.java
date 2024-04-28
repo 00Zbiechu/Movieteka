@@ -35,10 +35,7 @@ public class MovieRewardController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns all rewards of movie",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = RewardsDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorList.class))})
+                            schema = @Schema(implementation = RewardsDto.class))})
     })
     @GetMapping
     public ResponseEntity<MovieRewardsDto> getAllRewardsForMovie(@RequestParam @Parameter(description = "Movie ID", example = "1") Long movieId) {
@@ -50,7 +47,10 @@ public class MovieRewardController {
             @ApiResponse(responseCode = "201", description = "Returns all rewards of movie",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = RewardsDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
+            @ApiResponse(responseCode = "404", description = "Movie does not exist",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))}),
+            @ApiResponse(responseCode = "404", description = "Reward does not exist",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
@@ -63,16 +63,22 @@ public class MovieRewardController {
 
     @Operation(summary = "Remove reward form movie by passing movieId and rewardId")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Returns all rewards of movie",
+            @ApiResponse(responseCode = "200", description = "Returns all rewards of movie",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = RewardsDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
+            @ApiResponse(responseCode = "404", description = "Movie does not exist",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))}),
+            @ApiResponse(responseCode = "404", description = "Reward does not exist",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))}),
+            @ApiResponse(responseCode = "404", description = "MovieReward does not exist",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
     @DeleteMapping
     public ResponseEntity<MovieRewardsDto> removeRewardFromMovie(@RequestParam @Parameter(description = "Movie ID", example = "1") Long movieId,
                                                                  @RequestParam @Parameter(description = "Reward ID", example = "1") Long rewardId) {
-        return new ResponseEntity<>(movieRewardService.removeRewardFromMovie(movieId, rewardId), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(movieRewardService.removeRewardFromMovie(movieId, rewardId), HttpStatus.OK);
     }
 }

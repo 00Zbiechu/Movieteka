@@ -41,6 +41,6 @@ public class RatingServiceImpl implements RatingService {
     }
 
     private MovieEntity getMovieEntityById(Long movieId) {
-        return movieRepository.findById(movieId).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST));
+        return movieRepository.findById(movieId).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
     }
 }

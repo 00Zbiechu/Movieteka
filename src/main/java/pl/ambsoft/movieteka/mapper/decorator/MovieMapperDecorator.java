@@ -1,7 +1,6 @@
 package pl.ambsoft.movieteka.mapper.decorator;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,6 @@ import pl.ambsoft.movieteka.model.entity.MovieEntity;
 import pl.ambsoft.movieteka.repository.CategoryRepository;
 
 import java.util.List;
-import java.util.Set;
 
 @NoArgsConstructor
 public abstract class MovieMapperDecorator implements MovieMapper {
@@ -42,7 +40,7 @@ public abstract class MovieMapperDecorator implements MovieMapper {
     private void setCategoriesForMovieEntity(AddMovieDto dto, MovieEntity movieEntity) {
         List<CategoryEntity> categoryEntityList = Lists.newArrayList();
         for (CategoryDto categoryDto : dto.getCategories()) {
-            categoryEntityList.add(categoryRepository.findByName(categoryDto.name()).orElseThrow(() -> new CustomErrorException("category", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)));
+            categoryEntityList.add(categoryRepository.findByName(categoryDto.name()).orElseThrow(() -> new CustomErrorException("category", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND)));
         }
         movieEntity.setCategoryEntities(categoryEntityList);
     }
@@ -55,16 +53,16 @@ public abstract class MovieMapperDecorator implements MovieMapper {
     }
 
     private void setCategoriesForMovieDto(MovieEntity entity, MovieDto movieDto) {
-        Set<CategoryDto> categoriesSet = Sets.newHashSet();
+        List<CategoryDto> categoryList = Lists.newArrayList();
         for (CategoryEntity categoryEntity : entity.getCategoryEntities()) {
-            categoriesSet.add(categoryMapper.toDto(categoryEntity));
+            categoryList.add(categoryMapper.toDto(categoryEntity));
         }
 
         if (movieDto.getCategories() == null) {
-            movieDto.setCategories(Sets.newHashSet());
+            movieDto.setCategories(Lists.newArrayList());
         }
 
-        movieDto.setCategories(categoriesSet);
+        movieDto.setCategories(categoryList);
     }
 
     @Override

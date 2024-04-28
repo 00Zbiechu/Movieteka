@@ -10,8 +10,6 @@ import pl.ambsoft.movieteka.model.dto.RewardDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.RewardsDto;
 import pl.ambsoft.movieteka.repository.RewardRepository;
 
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class RewardServiceImpl implements RewardService {
@@ -22,7 +20,7 @@ public class RewardServiceImpl implements RewardService {
 
     @Override
     public RewardsDto getRewards() {
-        return RewardsDto.builder().rewards(rewardRepository.findAll().stream().map(rewardMapper::toDto).collect(Collectors.toSet())).build();
+        return RewardsDto.builder().rewards(rewardRepository.findAll().stream().map(rewardMapper::toDto).toList()).build();
     }
 
     @Override
@@ -36,7 +34,7 @@ public class RewardServiceImpl implements RewardService {
     @Override
     public RewardsDto deleteReward(Long id) {
         var rewardEntity = rewardRepository.findById(id).orElseThrow(
-                () -> new CustomErrorException("reward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.BAD_REQUEST)
+                () -> new CustomErrorException("reward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND)
         );
         rewardRepository.delete(rewardEntity);
         return getRewards();

@@ -14,7 +14,9 @@
 <li>test - profil do przeprowadzania testów</li> 
 </ul>
 
-W przypadku chęci uruchomienia testów lub uruchomienia aplikacji z profilu dev wymagane jest wcześniejsze zbudowanie
+W przypadku chęci uruchomienia aplikacji z profilu dev wymagane jest wcześniejsze zbudowanie
 kontenera z bazą danych z katalogu docker-local poleceniem 'docker-compose up -d'
+<br>
+Testy wykonywane są w kontenerze Testcontainers - nie jest wymagane tworzenie kontenera
 
 

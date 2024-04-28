@@ -11,6 +11,9 @@ import pl.ambsoft.movieteka.model.dto.RewardDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.RewardsDto;
 import pl.ambsoft.movieteka.repository.RewardRepository;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Component
 @RequiredArgsConstructor
 public class RewardValidator implements Validator {
@@ -29,14 +32,17 @@ public class RewardValidator implements Validator {
     }
 
     private void validateIsNameUnique(RewardsDto rewardsDto) {
+        Set<String> uniqueNames = new HashSet<>();
         for (RewardDto rewardDto : rewardsDto.rewards()) {
             if (rewardDto.name() == null) {
                 throw new CustomErrorException("reward", ErrorCodes.FIELD_ERROR, HttpStatus.BAD_REQUEST);
             }
+            if (!uniqueNames.add(rewardDto.name())) {
+                throw new CustomErrorException(rewardDto.name(), ErrorCodes.DUPLICATE_NAME, HttpStatus.BAD_REQUEST);
+            }
             rewardRepository.findByName(rewardDto.name()).ifPresent(reward -> {
-                        throw new CustomErrorException(reward.getName(), ErrorCodes.ENTITY_ALREADY_EXIST, HttpStatus.BAD_REQUEST);
-                    }
-            );
+                throw new CustomErrorException(reward.getName(), ErrorCodes.ENTITY_ALREADY_EXIST, HttpStatus.BAD_REQUEST);
+            });
         }
     }
 }

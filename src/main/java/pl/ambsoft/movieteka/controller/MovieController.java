@@ -71,6 +71,9 @@ public class MovieController {
                             schema = @Schema(implementation = MoviesDto.class))}),
             @ApiResponse(responseCode = "400", description = "Return error list",
                     content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))}),
+            @ApiResponse(responseCode = "404", description = "Category does not exist",
+                    content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -87,6 +90,12 @@ public class MovieController {
                             schema = @Schema(implementation = MoviesDto.class))}),
             @ApiResponse(responseCode = "400", description = "Return error list",
                     content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))}),
+            @ApiResponse(responseCode = "404", description = "Movie does not exist",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorList.class))}),
+            @ApiResponse(responseCode = "404", description = "Category does not exist",
+                    content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -98,26 +107,23 @@ public class MovieController {
 
     @Operation(summary = "Delete movie by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Return list of all movies",
+            @ApiResponse(responseCode = "200", description = "Return list of all movies",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = MoviesDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
+            @ApiResponse(responseCode = "404", description = "Movie does not exist",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
     @DeleteMapping
     public ResponseEntity<MoviesDto> deleteMovie(@RequestParam @Parameter(description = "Movie ID", example = "1") Long id) {
-        return new ResponseEntity<>(movieService.deleteMovie(id), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(movieService.deleteMovie(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Filter movies by category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns a list of movies in a given category",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MoviesDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorList.class))})
+                            schema = @Schema(implementation = MoviesDto.class))})
     })
     @GetMapping("/filter")
     public ResponseEntity<MoviesDto> filterMovieByCategory(@RequestParam @Parameter(description = "Category name", example = "drama") String category) {
@@ -128,10 +134,7 @@ public class MovieController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns a list of movies which contains pass phrase in title",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MoviesDto.class))}),
-            @ApiResponse(responseCode = "400", description = "Return error list",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorList.class))})
+                            schema = @Schema(implementation = MoviesDto.class))})
     })
     @GetMapping("/search")
     public ResponseEntity<MoviesDto> searchMovieByTitle(@RequestParam @Parameter(description = "Movie title", example = "Mad Max") String title) {
