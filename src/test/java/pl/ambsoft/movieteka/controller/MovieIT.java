@@ -22,6 +22,7 @@ import pl.ambsoft.movieteka.model.entity.MovieEntity;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.querydsl.codegen.utils.Symbols.EMPTY;
@@ -38,6 +39,8 @@ class MovieIT extends BaseTest {
     void shouldReturnAllMovies() throws Exception {
 
         //given
+        Objects.requireNonNull(cacheManager.getCache("movies")).clear();
+
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")

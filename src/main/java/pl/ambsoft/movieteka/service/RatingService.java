@@ -5,7 +5,5 @@ import pl.ambsoft.movieteka.model.dto.wrapper.RatingsDto;
 
 public interface RatingService {
 
-    RatingsDto getMovieRatings(Long movieId);
-
     RatingsDto addMovieRating(Long movieId, RatingDto ratingDto);
 }

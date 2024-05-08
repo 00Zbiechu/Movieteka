@@ -1,8 +1,10 @@
 package pl.ambsoft.movieteka.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import pl.ambsoft.movieteka.cache.RatingCacheService;
 import pl.ambsoft.movieteka.exception.CustomErrorException;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
 import pl.ambsoft.movieteka.mapper.RatingMapper;
@@ -23,21 +25,16 @@ public class RatingServiceImpl implements RatingService {
 
     private final RatingRepository ratingRepository;
 
-    @Override
-    public RatingsDto getMovieRatings(Long movieId) {
-        MovieEntity movieEntity = getMovieEntityById(movieId);
-        return RatingsDto.builder()
-                .ratings(movieEntity.getRatingEntities().stream().map(ratingMapper::toDto).toList())
-                .build();
-    }
+    private final RatingCacheService ratingCacheService;
 
+    @CacheEvict(cacheNames = "ratingsByMovieId", allEntries = true, beforeInvocation = true)
     @Override
     public RatingsDto addMovieRating(Long movieId, RatingDto ratingDto) {
         MovieEntity movieEntity = getMovieEntityById(movieId);
         RatingEntity ratingEntity = ratingMapper.toEntity(ratingDto);
         ratingEntity.setMovieEntity(movieEntity);
         ratingRepository.save(ratingEntity);
-        return getMovieRatings(movieId);
+        return ratingCacheService.getMovieRatings(movieId);
     }
 
     private MovieEntity getMovieEntityById(Long movieId) {

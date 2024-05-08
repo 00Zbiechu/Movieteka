@@ -2,9 +2,12 @@ package pl.ambsoft.movieteka.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import pl.ambsoft.movieteka.cache.MovieCacheService;
 import pl.ambsoft.movieteka.exception.CustomErrorException;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
 import pl.ambsoft.movieteka.mapper.MovieMapper;
@@ -28,6 +31,8 @@ public class MovieServiceImpl implements MovieService {
 
     private final PhotoCompressor photoCompressor;
 
+    private final MovieCacheService movieCacheService;
+
     private final MovieQueryService movieQueryService;
 
     @Value("${movie.photo.width.size}")
@@ -36,26 +41,23 @@ public class MovieServiceImpl implements MovieService {
     @Value("${movie.photo.height.size}")
     private Integer moviePhotoHeight;
 
-    @Override
-    public MoviesDto getAllMovies() {
-        return MoviesDto.builder().movies(movieRepository.findAll().stream().map(movieMapper::toDto).toList()).build();
-    }
-
+    @CacheEvict(cacheNames = {"movies", "moviesByCategory", "moviesByTitle"}, allEntries = true, beforeInvocation = true)
     @Override
     public MoviesDto addNewMovie(AddMovieDto addMovieDto, MultipartFile photo) {
         var movieEntity = movieMapper.toEntity(addMovieDto);
         setPhotoForMovieEntity(photo, movieEntity);
         movieRepository.save(movieEntity);
-        return getAllMovies();
+        return movieCacheService.getAllMovies();
     }
 
+    @CacheEvict(cacheNames = {"movies", "moviesByCategory", "moviesByTitle"}, allEntries = true, beforeInvocation = true)
     @Override
     public MoviesDto editMovie(EditMovieDto editMovieDto, MultipartFile photo) {
         var movieEntity = movieRepository.findById(editMovieDto.getId()).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
         movieMapper.updateMovieEntityWithEditMovieDto(editMovieDto, movieEntity);
         setPhotoForMovieEntity(photo, movieEntity);
         movieRepository.save(movieEntity);
-        return getAllMovies();
+        return movieCacheService.getAllMovies();
     }
 
     private void setPhotoForMovieEntity(MultipartFile photo, MovieEntity movieEntity) {
@@ -69,18 +71,21 @@ public class MovieServiceImpl implements MovieService {
         }
     }
 
+    @CacheEvict(cacheNames = {"movies", "moviesByCategory", "moviesByTitle"}, allEntries = true, beforeInvocation = true)
     @Override
     public MoviesDto deleteMovie(Long id) {
         var movieEntity = movieRepository.findById(id).orElseThrow(() -> new CustomErrorException("movie", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
         movieRepository.delete(movieEntity);
-        return getAllMovies();
+        return movieCacheService.getAllMovies();
     }
 
+    @Cacheable(cacheNames = "moviesByCategory", key = "#category")
     @Override
     public MoviesDto filterMovieByCategory(String category) {
         return MoviesDto.builder().movies(movieRepository.findByCategory(category).stream().map(movieMapper::toDto).toList()).build();
     }
 
+    @Cacheable(cacheNames = "moviesByTitle", key = "#title")
     @Override
     public MoviesDto searchMovieByTitle(String title) {
         return MoviesDto.builder().movies(movieQueryService.getMovieEntityByTitle(title).stream().map(movieMapper::toDto).toList()).build();

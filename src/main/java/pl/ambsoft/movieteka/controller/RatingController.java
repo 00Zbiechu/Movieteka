@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.ambsoft.movieteka.cache.RatingCacheService;
 import pl.ambsoft.movieteka.exception.wrapper.ErrorList;
 import pl.ambsoft.movieteka.model.dto.RatingDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.RatingsDto;
@@ -30,6 +31,8 @@ public class RatingController {
 
     private final RatingService ratingService;
 
+    private final RatingCacheService ratingCacheService;
+
     @Operation(summary = "Get list of all ratings by movie id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Return list of ratings for movie by id",
@@ -41,7 +44,7 @@ public class RatingController {
     })
     @GetMapping
     public ResponseEntity<RatingsDto> getMovieRatings(@RequestParam @Parameter(description = "Movie ID", example = "1") Long movieId) {
-        return new ResponseEntity<>(ratingService.getMovieRatings(movieId), HttpStatus.OK);
+        return new ResponseEntity<>(ratingCacheService.getMovieRatings(movieId), HttpStatus.OK);
     }
 
     @Operation(summary = "Add new movie rating")

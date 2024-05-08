@@ -1,11 +1,12 @@
 package pl.ambsoft.movieteka.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import pl.ambsoft.movieteka.cache.MovieRewardCacheService;
 import pl.ambsoft.movieteka.exception.CustomErrorException;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
-import pl.ambsoft.movieteka.model.dto.MovieRewardDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.MovieRewardsDto;
 import pl.ambsoft.movieteka.model.entity.MovieRewardEntity;
 import pl.ambsoft.movieteka.model.entity.key.MovieRewardKey;
@@ -14,7 +15,6 @@ import pl.ambsoft.movieteka.repository.MovieRewardRepository;
 import pl.ambsoft.movieteka.repository.RewardRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,18 +26,9 @@ public class MovieRewardServiceImpl implements MovieRewardService {
 
     private final RewardRepository rewardRepository;
 
-    @Override
-    public MovieRewardsDto getAllRewardsForMovie(Long movieId) {
-        List<MovieRewardEntity> movieRewardEntities = movieRewardRepository.findAllByMovieId(movieId);
-        return MovieRewardsDto.builder().movieRewards(movieRewardEntities.stream()
-                        .map(movieReward -> MovieRewardDto.builder()
-                                .id(movieReward.getMovieRewardKey().getRewardEntity().getId())
-                                .name(movieReward.getMovieRewardKey().getRewardEntity().getName())
-                                .awardReceivedDate(movieReward.getAwardReceivedDate())
-                                .build()).toList())
-                .build();
-    }
+    private final MovieRewardCacheService movieRewardCacheService;
 
+    @CacheEvict(value = "movieRewardsByMovieId", allEntries = true, beforeInvocation = true)
     @Override
     public MovieRewardsDto addRewardToMovie(Long movieId, Long rewardId, LocalDate awardReceivedDate) {
         var movieRewardEntity = MovieRewardEntity.builder()
@@ -55,9 +46,10 @@ public class MovieRewardServiceImpl implements MovieRewardService {
                 }
         );
         movieRewardRepository.save(movieRewardEntity);
-        return getAllRewardsForMovie(movieId);
+        return movieRewardCacheService.getAllRewardsForMovie(movieId);
     }
 
+    @CacheEvict(value = "movieRewardsByMovieId", allEntries = true, beforeInvocation = true)
     @Override
     public MovieRewardsDto removeRewardFromMovie(Long movieId, Long rewardId) {
         var movieRewardEntity = movieRewardRepository.findById(MovieRewardKey.builder()
@@ -65,6 +57,6 @@ public class MovieRewardServiceImpl implements MovieRewardService {
                 .rewardEntity(rewardRepository.findById(rewardId).orElseThrow(() -> new CustomErrorException("reward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND)))
                 .build()).orElseThrow(() -> new CustomErrorException("movieReward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
         movieRewardRepository.delete(movieRewardEntity);
-        return getAllRewardsForMovie(movieId);
+        return movieRewardCacheService.getAllRewardsForMovie(movieId);
     }
 }

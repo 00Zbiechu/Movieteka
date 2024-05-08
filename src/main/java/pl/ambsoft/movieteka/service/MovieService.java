@@ -7,8 +7,6 @@ import pl.ambsoft.movieteka.model.dto.wrapper.MoviesDto;
 
 public interface MovieService {
 
-    MoviesDto getAllMovies();
-
     MoviesDto addNewMovie(AddMovieDto addMovieDto, MultipartFile photo);
 
     MoviesDto editMovie(EditMovieDto editMovieDto, MultipartFile photo);

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.ambsoft.movieteka.cache.MovieRewardCacheService;
 import pl.ambsoft.movieteka.exception.wrapper.ErrorList;
 import pl.ambsoft.movieteka.model.dto.wrapper.MovieRewardsDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.RewardsDto;
@@ -31,6 +32,8 @@ public class MovieRewardController {
 
     private final MovieRewardService movieRewardService;
 
+    private final MovieRewardCacheService movieRewardCacheService;
+
     @Operation(summary = "Get all rewards for movie by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns all rewards of movie",
@@ -39,7 +42,7 @@ public class MovieRewardController {
     })
     @GetMapping
     public ResponseEntity<MovieRewardsDto> getAllRewardsForMovie(@RequestParam @Parameter(description = "Movie ID", example = "1") Long movieId) {
-        return new ResponseEntity<>(movieRewardService.getAllRewardsForMovie(movieId), HttpStatus.OK);
+        return new ResponseEntity<>(movieRewardCacheService.getAllRewardsForMovie(movieId), HttpStatus.OK);
     }
 
     @Operation(summary = "Add reward to movie by passing movieId, rewardId and award received date")

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import pl.ambsoft.movieteka.cache.MovieCacheService;
 import pl.ambsoft.movieteka.exception.wrapper.ErrorList;
 import pl.ambsoft.movieteka.model.dto.AddMovieDto;
 import pl.ambsoft.movieteka.model.dto.EditMovieDto;
@@ -41,6 +42,10 @@ public class MovieController {
 
     private final EditMovieValidator editMovieValidator;
 
+    private final MovieService movieService;
+
+    private final MovieCacheService movieCacheService;
+
     @InitBinder("addMovieDto")
     public void validateAddMovie(WebDataBinder binder) {
         binder.addValidators(addMovieValidator);
@@ -51,8 +56,6 @@ public class MovieController {
         binder.addValidators(editMovieValidator);
     }
 
-    private final MovieService movieService;
-
     @Operation(summary = "Get all movies")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Return list of all movies",
@@ -61,7 +64,7 @@ public class MovieController {
     })
     @GetMapping
     public ResponseEntity<MoviesDto> getAllMovies() {
-        return new ResponseEntity<>(movieService.getAllMovies(), HttpStatus.OK);
+        return new ResponseEntity<>(movieCacheService.getAllMovies(), HttpStatus.OK);
     }
 
     @Operation(summary = "Add new movie with optional photo")

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.ambsoft.movieteka.cache.RewardCacheService;
 import pl.ambsoft.movieteka.exception.wrapper.ErrorList;
 import pl.ambsoft.movieteka.model.dto.wrapper.RewardsDto;
 import pl.ambsoft.movieteka.service.RewardService;
@@ -33,6 +34,8 @@ import pl.ambsoft.movieteka.validator.RewardValidator;
 public class RewardController {
 
     private final RewardService rewardService;
+
+    private final RewardCacheService rewardCacheService;
 
     private final RewardValidator rewardValidator;
 
@@ -49,7 +52,7 @@ public class RewardController {
     })
     @GetMapping
     public ResponseEntity<RewardsDto> getRewards() {
-        return new ResponseEntity<>(rewardService.getRewards(), HttpStatus.OK);
+        return new ResponseEntity<>(rewardCacheService.getRewards(), HttpStatus.OK);
     }
 
     @Operation(summary = "Add new rewards")
