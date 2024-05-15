@@ -19,13 +19,13 @@ class CategoryIT extends BaseTest {
     @Test
     void shouldReturnAllCategories() throws Exception {
 
-        //given
+        //given:
         var expectedNumberOfCategories = 13;
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH));
 
-        //then
+        //then:
         var result = asObject(response, CategoriesDto.class);
         response.andExpect(status().isOk());
         Assertions.assertEquals(expectedNumberOfCategories, result.getCategories().size());

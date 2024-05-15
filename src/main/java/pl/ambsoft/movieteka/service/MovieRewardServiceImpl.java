@@ -28,6 +28,11 @@ public class MovieRewardServiceImpl implements MovieRewardService {
 
     private final MovieRewardCacheService movieRewardCacheService;
 
+    @Override
+    public MovieRewardsDto getAllRewardsForMovie(Long movieId) {
+        return movieRewardCacheService.getAllRewardsForMovie(movieId);
+    }
+
     @CacheEvict(value = "movieRewardsByMovieId", allEntries = true, beforeInvocation = true)
     @Override
     public MovieRewardsDto addRewardToMovie(Long movieId, Long rewardId, LocalDate awardReceivedDate) {
@@ -46,7 +51,7 @@ public class MovieRewardServiceImpl implements MovieRewardService {
                 }
         );
         movieRewardRepository.save(movieRewardEntity);
-        return movieRewardCacheService.getAllRewardsForMovie(movieId);
+        return getAllRewardsForMovie(movieId);
     }
 
     @CacheEvict(value = "movieRewardsByMovieId", allEntries = true, beforeInvocation = true)
@@ -57,6 +62,6 @@ public class MovieRewardServiceImpl implements MovieRewardService {
                 .rewardEntity(rewardRepository.findById(rewardId).orElseThrow(() -> new CustomErrorException("reward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND)))
                 .build()).orElseThrow(() -> new CustomErrorException("movieReward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND));
         movieRewardRepository.delete(movieRewardEntity);
-        return movieRewardCacheService.getAllRewardsForMovie(movieId);
+        return getAllRewardsForMovie(movieId);
     }
 }

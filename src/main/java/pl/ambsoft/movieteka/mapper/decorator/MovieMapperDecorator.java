@@ -10,7 +10,6 @@ import pl.ambsoft.movieteka.mapper.CategoryMapper;
 import pl.ambsoft.movieteka.mapper.MovieMapper;
 import pl.ambsoft.movieteka.model.dto.AddMovieDto;
 import pl.ambsoft.movieteka.model.dto.CategoryDto;
-import pl.ambsoft.movieteka.model.dto.EditMovieDto;
 import pl.ambsoft.movieteka.model.dto.MovieDto;
 import pl.ambsoft.movieteka.model.entity.CategoryEntity;
 import pl.ambsoft.movieteka.model.entity.MovieEntity;
@@ -66,7 +65,7 @@ public abstract class MovieMapperDecorator implements MovieMapper {
     }
 
     @Override
-    public void updateMovieEntityWithEditMovieDto(EditMovieDto editMovieDto, MovieEntity movieEntity) {
+    public void updateMovieEntityWithEditMovieDto(MovieDto editMovieDto, MovieEntity movieEntity) {
         movieMapper.updateMovieEntityWithEditMovieDto(editMovieDto, movieEntity);
         setCategoriesForMovieEntity(editMovieDto, movieEntity);
     }

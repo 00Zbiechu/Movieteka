@@ -22,13 +22,18 @@ public class RewardServiceImpl implements RewardService {
 
     private final RewardCacheService rewardCacheService;
 
+    @Override
+    public RewardsDto getRewards() {
+        return rewardCacheService.getRewards();
+    }
+
     @CacheEvict(cacheNames = "rewards", allEntries = true, beforeInvocation = true)
     @Override
     public RewardsDto addNewRewards(RewardsDto rewardsDto) {
         for (RewardDto rewardDto : rewardsDto.rewards()) {
             rewardRepository.save(rewardMapper.toEntity(rewardDto));
         }
-        return rewardCacheService.getRewards();
+        return getRewards();
     }
 
     @CacheEvict(cacheNames = "rewards", allEntries = true, beforeInvocation = true)
@@ -38,6 +43,6 @@ public class RewardServiceImpl implements RewardService {
                 () -> new CustomErrorException("reward", ErrorCodes.ENTITY_DOES_NOT_EXIST, HttpStatus.NOT_FOUND)
         );
         rewardRepository.delete(rewardEntity);
-        return rewardCacheService.getRewards();
+        return getRewards();
     }
 }

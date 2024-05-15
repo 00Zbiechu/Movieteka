@@ -33,7 +33,7 @@ class MovieRewardIT extends BaseTest {
     @Test
     void shouldReturnListOfAllMoviesWithRewards() throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder()
                 .name("horror")
                 .build();
@@ -81,10 +81,10 @@ class MovieRewardIT extends BaseTest {
         entityManager.persist(movieRewardEntity);
         entityManager.persist(movieRewardEntityTwo);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH).param("movieId", movieEntity.getId().toString()));
 
-        //then
+        //then:
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isOk());
         assertAll(
@@ -102,7 +102,7 @@ class MovieRewardIT extends BaseTest {
     @Test
     void shouldAddRewardToMovie() throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder()
                 .name("horror")
                 .build();
@@ -127,14 +127,14 @@ class MovieRewardIT extends BaseTest {
         entityManager.persist(rewardEntity);
 
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .param("movieId", movieEntity.getId().toString())
                 .param("rewardId", rewardEntity.getId().toString())
                 .param("awardReceivedDate", LocalDate.now().toString())
         );
 
-        //then
+        //then:
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isCreated());
         assertAll(
@@ -149,7 +149,7 @@ class MovieRewardIT extends BaseTest {
     @MethodSource("addMovieRewardsTestArguments")
     void shouldNotAddRewardToMovieCauseWrongRequestDataParam(Long movieId, Long rewardId, LocalDate awardReceivedDate) throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder()
                 .name("horror")
                 .build();
@@ -173,14 +173,14 @@ class MovieRewardIT extends BaseTest {
 
         entityManager.persist(rewardEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .param("movieId", movieId.toString())
                 .param("rewardId", rewardId.toString())
                 .param("awardReceivedDate", awardReceivedDate.toString())
         );
 
-        //then
+        //then:
         response.andExpect(status().isNotFound());
     }
 
@@ -195,7 +195,7 @@ class MovieRewardIT extends BaseTest {
     @Test
     void shouldRemoveRewardFromMovie() throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder()
                 .name("horror")
                 .build();
@@ -243,13 +243,13 @@ class MovieRewardIT extends BaseTest {
         entityManager.persist(movieRewardEntity);
         entityManager.persist(movieRewardEntityTwo);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH)
                 .param("movieId", movieEntity.getId().toString())
                 .param("rewardId", rewardEntity.getId().toString())
         );
 
-        //then
+        //then:
         var result = asObject(response, MovieRewardsDto.class);
         response.andExpect(status().isOk());
         Assertions.assertEquals(1, result.movieRewards().size());
@@ -259,7 +259,7 @@ class MovieRewardIT extends BaseTest {
     @Test
     void shouldNotRemoveRewardFromMovieCauseWrongDataInRequestParam() throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder()
                 .name("horror")
                 .build();
@@ -307,13 +307,13 @@ class MovieRewardIT extends BaseTest {
         entityManager.persist(movieRewardEntity);
         entityManager.persist(movieRewardEntityTwo);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH)
                 .param("movieId", String.valueOf(movieEntity.getId() + 1L))
                 .param("rewardId", rewardEntity.getId().toString())
         );
 
-        //then
+        //then:
         var result = asObject(response, ErrorList.class);
         response.andExpect(status().isBadRequest());
         assertAll(

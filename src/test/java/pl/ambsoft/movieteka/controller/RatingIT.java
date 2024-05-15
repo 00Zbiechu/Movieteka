@@ -33,7 +33,7 @@ class RatingIT extends BaseTest {
     @Test
     void shouldReturnListOfAllRatings() throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder().name("horror").build();
 
         entityManager.persist(categoryEntity);
@@ -59,11 +59,11 @@ class RatingIT extends BaseTest {
 
         entityManager.persist(movieEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH)
                 .param("movieId", movieEntity.getId().toString()));
 
-        //then
+        //then:
         var result = asObject(response, RatingsDto.class);
         response.andExpect(status().isOk());
         assertAll(
@@ -78,7 +78,7 @@ class RatingIT extends BaseTest {
     @MethodSource("ratingTestArguments")
     void shouldReturnBadRequestWhenAddRatingEndpointIsHitCauseWrongData(String comment, Float score) throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder().name("horror").build();
 
         entityManager.persist(categoryEntity);
@@ -100,13 +100,13 @@ class RatingIT extends BaseTest {
                 .score(score)
                 .build();
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(ratingDto))
                 .param("movieId", movieEntity.getId().toString()));
 
-        //then
+        //then:
         response.andExpect(status().isBadRequest());
     }
 
@@ -124,7 +124,7 @@ class RatingIT extends BaseTest {
     @Test
     void shouldReturnNotFoundStatusWhenAddRatingEndpointIsHitCauseMovieDoesNotExist() throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder().name("horror").build();
 
         entityManager.persist(categoryEntity);
@@ -146,13 +146,13 @@ class RatingIT extends BaseTest {
                 .score(4.4f)
                 .build();
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(ratingDto))
                 .param("movieId", String.valueOf(movieEntity.getId() + 1)));
 
-        //then
+        //then:
         var result = asObject(response, ErrorList.class);
         response.andExpect(status().isNotFound());
         assertAll(

@@ -11,7 +11,6 @@ import pl.ambsoft.movieteka.exception.CustomErrorException;
 import pl.ambsoft.movieteka.exception.errors.ErrorCodes;
 import pl.ambsoft.movieteka.model.dto.AddMovieDto;
 import pl.ambsoft.movieteka.model.dto.CategoryDto;
-import pl.ambsoft.movieteka.model.dto.MovieDto;
 import pl.ambsoft.movieteka.repository.CategoryRepository;
 import pl.ambsoft.movieteka.repository.MovieRepository;
 
@@ -27,7 +26,7 @@ public class AddMovieValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.isAssignableFrom(MovieDto.class);
+        return clazz.isAssignableFrom(AddMovieDto.class);
     }
 
     @Override

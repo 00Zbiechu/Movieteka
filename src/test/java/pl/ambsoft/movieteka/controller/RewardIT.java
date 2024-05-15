@@ -27,17 +27,17 @@ class RewardIT extends BaseTest {
     @Test
     void shouldReturnListOfRewards() throws Exception {
 
-        //given
+        //given:
         var rewardEntity = RewardEntity.builder()
                 .name("Oscar")
                 .build();
 
         entityManager.persist(rewardEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH));
 
-        //then
+        //then:
         var result = asObject(response, RewardsDto.class);
         response.andExpect(status().isOk());
         assertAll(
@@ -51,7 +51,7 @@ class RewardIT extends BaseTest {
     @Test
     void shouldAddNewReward() throws Exception {
 
-        //given
+        //given:
         RewardsDto rewardsDto = RewardsDto.builder()
                 .rewards(
                         List.of(
@@ -62,12 +62,12 @@ class RewardIT extends BaseTest {
                 )
                 .build();
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(rewardsDto)));
 
-        //then
+        //then:
         var result = asObject(response, RewardsDto.class);
         response.andExpect(status().isCreated());
         assertAll(
@@ -80,7 +80,7 @@ class RewardIT extends BaseTest {
     @Test
     void shouldReturnBadRequestWhenAddMethodCauseBlankNameOfRewardName() throws Exception {
 
-        //given
+        //given:
         RewardsDto rewardsDto = RewardsDto.builder()
                 .rewards(
                         List.of(
@@ -91,12 +91,12 @@ class RewardIT extends BaseTest {
                 )
                 .build();
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(rewardsDto)));
 
-        //then
+        //then:
         var result = asObject(response, ErrorList.class);
         response.andExpect(status().isBadRequest());
         assertAll(
@@ -110,7 +110,7 @@ class RewardIT extends BaseTest {
     @Test
     void shouldReturnBadRequestWhenAddMethodCauseEmptyRewardList() throws Exception {
 
-        //given
+        //given:
         RewardsDto rewardsDto = RewardsDto.builder()
                 .rewards(
                         List.of(
@@ -124,12 +124,12 @@ class RewardIT extends BaseTest {
                 )
                 .build();
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(rewardsDto)));
 
-        //then
+        //then:
         var result = asObject(response, ErrorList.class);
         response.andExpect(status().isBadRequest());
         assertAll(
@@ -143,19 +143,19 @@ class RewardIT extends BaseTest {
     @Test
     void shouldReturnBadRequestWhenAddMethodCauseDuplicateRewardNameInList() throws Exception {
 
-        //given
+        //given:
         RewardsDto rewardsDto = RewardsDto.builder()
                 .rewards(
                         List.of()
                 )
                 .build();
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(rewardsDto)));
 
-        //then
+        //then:
         var result = asObject(response, ErrorList.class);
         response.andExpect(status().isBadRequest());
         assertAll(
@@ -169,18 +169,18 @@ class RewardIT extends BaseTest {
     @Test
     void shouldDeleteReward() throws Exception {
 
-        //given
+        //given:
         var rewardEntity = RewardEntity.builder()
                 .name("Oscar")
                 .build();
 
         entityManager.persist(rewardEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH)
                 .param("id", rewardEntity.getId().toString()));
 
-        //then
+        //then:
         var result = asObject(response, RewardsDto.class);
         response.andExpect(status().isOk());
         Assertions.assertEquals(0, result.rewards().size());
@@ -190,18 +190,18 @@ class RewardIT extends BaseTest {
     @Test
     void shouldReturnBadRequestWhenDeleteRewardEndpointIsHitCauseRewardWithIdDoesNotExist() throws Exception {
 
-        //given
+        //given:
         var rewardEntity = RewardEntity.builder()
                 .name("Oscar")
                 .build();
 
         entityManager.persist(rewardEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH)
                 .param("id", String.valueOf(rewardEntity.getId() + 1)));
 
-        //then
+        //then:
         response.andExpect(status().isNotFound());
     }
 }

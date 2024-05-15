@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,15 +17,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import pl.ambsoft.movieteka.cache.MovieCacheService;
 import pl.ambsoft.movieteka.exception.wrapper.ErrorList;
 import pl.ambsoft.movieteka.model.dto.AddMovieDto;
-import pl.ambsoft.movieteka.model.dto.EditMovieDto;
+import pl.ambsoft.movieteka.model.dto.MovieDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.MoviesDto;
 import pl.ambsoft.movieteka.service.MovieService;
 import pl.ambsoft.movieteka.validator.AddMovieValidator;
@@ -43,8 +40,6 @@ public class MovieController {
     private final EditMovieValidator editMovieValidator;
 
     private final MovieService movieService;
-
-    private final MovieCacheService movieCacheService;
 
     @InitBinder("addMovieDto")
     public void validateAddMovie(WebDataBinder binder) {
@@ -64,10 +59,10 @@ public class MovieController {
     })
     @GetMapping
     public ResponseEntity<MoviesDto> getAllMovies() {
-        return new ResponseEntity<>(movieCacheService.getAllMovies(), HttpStatus.OK);
+        return new ResponseEntity<>(movieService.getAllMovies(), HttpStatus.OK);
     }
 
-    @Operation(summary = "Add new movie with optional photo")
+    @Operation(summary = "Add new movie")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Return list of all movies",
                     content = {@Content(mediaType = "application/json",
@@ -79,14 +74,12 @@ public class MovieController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MoviesDto> addNewMovie(
-            @RequestPart(required = false) MultipartFile photo,
-            @Valid @RequestPart AddMovieDto addMovieDto) {
-        return new ResponseEntity<>(movieService.addNewMovie(addMovieDto, photo), HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<MoviesDto> addNewMovie(@Valid @RequestBody AddMovieDto addMovieDto) {
+        return new ResponseEntity<>(movieService.addNewMovie(addMovieDto), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Edit existing movie data with optional photo")
+    @Operation(summary = "Edit existing movie data")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Return list of all movies",
                     content = {@Content(mediaType = "application/json",
@@ -101,11 +94,9 @@ public class MovieController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorList.class))})
     })
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MoviesDto> editMovie(
-            @RequestPart(required = false) MultipartFile photo,
-            @Valid @RequestPart EditMovieDto editMovieDto) {
-        return new ResponseEntity<>(movieService.editMovie(editMovieDto, photo), HttpStatus.OK);
+    @PutMapping
+    public ResponseEntity<MoviesDto> editMovie(@Valid @RequestBody MovieDto movieDto) {
+        return new ResponseEntity<>(movieService.editMovie(movieDto), HttpStatus.OK);
     }
 
     @Operation(summary = "Delete movie by id")

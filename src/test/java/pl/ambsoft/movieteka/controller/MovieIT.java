@@ -7,27 +7,21 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpMethod;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.ambsoft.movieteka.BaseTest;
 import pl.ambsoft.movieteka.model.dto.AddMovieDto;
 import pl.ambsoft.movieteka.model.dto.CategoryDto;
-import pl.ambsoft.movieteka.model.dto.EditMovieDto;
 import pl.ambsoft.movieteka.model.dto.MovieDto;
 import pl.ambsoft.movieteka.model.dto.wrapper.MoviesDto;
 import pl.ambsoft.movieteka.model.entity.CategoryEntity;
 import pl.ambsoft.movieteka.model.entity.MovieEntity;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.querydsl.codegen.utils.Symbols.EMPTY;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class MovieIT extends BaseTest {
@@ -38,7 +32,7 @@ class MovieIT extends BaseTest {
     @Test
     void shouldReturnAllMovies() throws Exception {
 
-        //given
+        //given:
         Objects.requireNonNull(cacheManager.getCache("movies")).clear();
 
         var movieEntity = MovieEntity.builder()
@@ -55,10 +49,10 @@ class MovieIT extends BaseTest {
 
         entityManager.persist(movieEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH));
 
-        //then
+        //then:
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
         assertAll(
@@ -76,7 +70,7 @@ class MovieIT extends BaseTest {
     @Test
     void shouldAddNewMovie() throws Exception {
 
-        //given
+        //given:
         var movie = AddMovieDto.builder()
                 .title("Test")
                 .description("Very nice movie")
@@ -99,13 +93,6 @@ class MovieIT extends BaseTest {
                         )
                 ).build();
 
-        var movieJson = new MockMultipartFile(
-                "addMovieDto",
-                null,
-                "application/json",
-                asJson(movie).getBytes()
-        );
-
         var expectedMovieList = List.of(
                 MoviesDto.builder()
                         .movies(
@@ -113,19 +100,14 @@ class MovieIT extends BaseTest {
                         .build()
         );
 
-        byte[] imageBytes = Files.readAllBytes(Paths.get("src/main/resources/image/test_image.jpg"));
 
-        MockMultipartFile photo = new MockMultipartFile("photo", "photo.png",
-                "image/png", imageBytes);
-
-
-        //when
-        var response = mockMvc.perform(MockMvcRequestBuilders.multipart(PATH)
-                .file(movieJson)
-                .file(photo)
+        //when:
+        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.POST, PATH)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(movie))
         );
 
-        //then
+        //then:
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isCreated());
         assertAll(
@@ -133,8 +115,7 @@ class MovieIT extends BaseTest {
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getDescription(), result.movies().get(0).getDescription()),
                 () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategories().size(), result.movies().get(0).getCategories().size()),
-                () -> assertNotNull(result.movies().get(0).getPhoto())
+                () -> Assertions.assertEquals(expectedMovieList.get(0).movies().get(0).getCategories().size(), result.movies().get(0).getCategories().size())
         );
     }
 
@@ -143,6 +124,7 @@ class MovieIT extends BaseTest {
     @ParameterizedTest
     void shouldReturnBadRequestWhenAddMovieEndpointIsUsed(String title, String description, Short yearOfProduction, String category) throws Exception {
 
+        //given:
         var movie = AddMovieDto.builder()
                 .title(title)
                 .description(description)
@@ -166,19 +148,13 @@ class MovieIT extends BaseTest {
                 )
                 .build());
 
-        var movieJson = new MockMultipartFile(
-                "movieDto",
-                null,
-                "application/json",
-                asJson(movie).getBytes()
+        //when:
+        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, PATH)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(movie))
         );
 
-        //when
-        var response = mockMvc.perform(MockMvcRequestBuilders.multipart(PATH)
-                .file(movieJson)
-        );
-
-        //then
+        //then:
         response.andExpect(status().isBadRequest());
     }
 
@@ -199,7 +175,7 @@ class MovieIT extends BaseTest {
     @Test
     void shouldEditMovieData() throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder().name("horror").build();
         var categoryEntityTwo = CategoryEntity.builder().name("melodrama").build();
 
@@ -216,7 +192,7 @@ class MovieIT extends BaseTest {
 
         entityManager.persist(movieEntity);
 
-        var editMovieDto = EditMovieDto.builder()
+        var editMovieDto = MovieDto.builder()
                 .id(movieEntity.getId())
                 .title("Test edit")
                 .description("Very nice movie edit")
@@ -231,32 +207,13 @@ class MovieIT extends BaseTest {
                         )
                 ).build();
 
-        var editMovieJson = new MockMultipartFile(
-                "editMovieDto",
-                null,
-                "application/json",
-                asJson(editMovieDto).getBytes()
+        //when:
+        var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.PUT, PATH)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(editMovieDto))
         );
 
-        byte[] imageBytes = Files.readAllBytes(Paths.get("src/main/resources/image/test_image.jpg"));
-
-        MockMultipartFile photo = new MockMultipartFile("photo", "photo.png",
-                "image/png", imageBytes);
-
-        //when
-        MockMultipartHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.multipart(PATH);
-        builder.with(request -> {
-            request.setMethod("PUT");
-            return request;
-        });
-
-        var response = mockMvc.perform(builder
-                .file(editMovieJson)
-                .file(photo)
-        );
-
-        //then
+        //then:
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
         assertAll(
@@ -264,8 +221,7 @@ class MovieIT extends BaseTest {
                 () -> Assertions.assertEquals(editMovieDto.getTitle(), result.movies().get(0).getTitle()),
                 () -> Assertions.assertEquals(editMovieDto.getDescription(), result.movies().get(0).getDescription()),
                 () -> Assertions.assertEquals(editMovieDto.getTitle(), result.movies().get(0).getTitle()),
-                () -> Assertions.assertEquals(editMovieDto.getCategories().size(), result.movies().get(0).getCategories().size()),
-                () -> assertNotNull(result.movies().get(0).getPhoto())
+                () -> Assertions.assertEquals(editMovieDto.getCategories().size(), result.movies().get(0).getCategories().size())
         );
     }
 
@@ -273,7 +229,7 @@ class MovieIT extends BaseTest {
     @Test
     void shouldDeleteMovie() throws Exception {
 
-        //given
+        //given:
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
@@ -288,10 +244,10 @@ class MovieIT extends BaseTest {
 
         entityManager.persist(movieEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH).param("id", movieEntity.getId().toString()));
 
-        //then
+        //then:
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
         Assertions.assertEquals(0, result.movies().size());
@@ -301,7 +257,7 @@ class MovieIT extends BaseTest {
     @Test
     void shouldNotDeleteMovieCauseEntityDoesNotExist() throws Exception {
 
-        //given
+        //given:
         var movieEntity = MovieEntity.builder()
                 .title("Test")
                 .description("Very nice movie")
@@ -316,10 +272,10 @@ class MovieIT extends BaseTest {
 
         entityManager.persist(movieEntity);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.DELETE, PATH).param("id", String.valueOf(movieEntity.getId() + 1)));
 
-        //then
+        //then:
         response.andExpect(status().isNotFound());
     }
 
@@ -329,7 +285,7 @@ class MovieIT extends BaseTest {
     @MethodSource("filterTestArguments")
     void shouldFilterMoviesAndByCategoryAndFindMovies(String category, int size) throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder().name("horror").build();
         var categoryEntityTwo = CategoryEntity.builder().name("melodrama").build();
         var categoryEntityThree = CategoryEntity.builder().name("sci-fi").build();
@@ -369,10 +325,10 @@ class MovieIT extends BaseTest {
         entityManager.persist(movieEntityHorrorTwo);
         entityManager.persist(movieEntityMelodramaThree);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/filter").param("category", category));
 
-        //then
+        //then:
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
         Assertions.assertEquals(size, result.movies().size());
@@ -391,7 +347,7 @@ class MovieIT extends BaseTest {
     @MethodSource("searchTestArguments")
     void shouldSearchAndFindMovieByTitle(String title, int size) throws Exception {
 
-        //given
+        //given:
         var categoryEntity = CategoryEntity.builder().name("horror").build();
         var categoryEntityTwo = CategoryEntity.builder().name("melodrama").build();
 
@@ -419,10 +375,10 @@ class MovieIT extends BaseTest {
         entityManager.persist(movieEntityHorrorOne);
         entityManager.persist(movieEntityHorrorTwo);
 
-        //when
+        //when:
         var response = mockMvc.perform(MockMvcRequestBuilders.request(HttpMethod.GET, PATH + "/search").param("title", title));
 
-        //then
+        //then:
         var result = asObject(response, MoviesDto.class);
         response.andExpect(status().isOk());
         Assertions.assertEquals(size, result.movies().size());

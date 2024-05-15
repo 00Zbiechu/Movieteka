@@ -1,15 +1,17 @@
 databaseChangeLog:
   - changeSet:
-      id: create_table_movie
+      id: create_table_cover
       author: mzbiewski
       preConditions:
         - onFail: MARK_RAN
           not:
             tableExists:
-              tableName: "MOVIE"
+              tableName: "COVER"
+          tableExists:
+            tableName: "MOVIE"
       changes:
         - createTable:
-            tableName: "MOVIE"
+            tableName: "COVER"
             columns:
               - column:
                   name: id
@@ -17,20 +19,26 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    primaryKeyName: MOVIE_ID_PK
+                    primaryKeyName: COVER_ID_PK
               - column:
-                  name: title
-                  type: varchar
+                  name: name
+                  type: varchar(50)
                   constraints:
                     nullable: false
               - column:
-                  name: year_of_production
-                  type: smallint
+                  name: format
+                  type: varchar(4)
                   constraints:
                     nullable: false
               - column:
-                  name: description
-                  type: text
+                  name: photo
+                  type: bytea
                   constraints:
                     nullable: false
-
+              - column:
+                  name: movie_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: COVER_MOVIE_FK
+                    referencedTableName: "MOVIE"
+                    referencedColumnNames: id

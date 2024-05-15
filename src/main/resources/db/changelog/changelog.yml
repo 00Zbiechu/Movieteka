@@ -17,3 +17,6 @@ databaseChangeLog:
   - include:
       file: ./changes/250420241143_create_table_rating.yml
       relativeToChangelogFile: true
+  - include:
+      file: ./changes/150520241832_create_table_cover.yml
+      relativeToChangelogFile: true

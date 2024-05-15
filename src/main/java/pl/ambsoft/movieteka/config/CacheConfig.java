@@ -20,7 +20,8 @@ public class CacheConfig implements CacheManagerCustomizer<ConcurrentMapCacheMan
                         "ratingsByMovieId",
                         "categories",
                         "rewards",
-                        "movieRewardsByMovieId"
+                        "movieRewardsByMovieId",
+                        "coverByMovieId"
                 )
         );
     }

@@ -35,8 +35,6 @@ public class MovieEntity extends BaseEntity {
     @Column(nullable = false)
     private String description;
 
-    private byte[] photo;
-
     @ManyToMany
     @JoinTable(
             name = "movie_category",
@@ -50,4 +48,7 @@ public class MovieEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "movieEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<RatingEntity> ratingEntities = Lists.newArrayList();
+
+    @OneToMany(mappedBy = "movieEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CoverEntity> coverEntities = Lists.newArrayList();
 }
